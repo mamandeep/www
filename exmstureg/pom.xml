@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--                                                                                         -->
+<!--  Example of POM that can be used to run a Sonar analysis on a PHP project with Maven.   -->
+<!--  => more documentation at http://docs.codehaus.org/display/SONAR/Analyse+with+Maven     -->
+<!--                                                                                         -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>id.hashcode</groupId>
+  <artifactId>xprofile</artifactId>
+  <name>xprofile Project</name>
+  <version>1.0-SNAPSHOT</version>
+  <!-- For the moment, specify pom as packaging for php projects -->
+  <packaging>pom</packaging>
+
+
+  <build>
+    <sourceDirectory>/opt/local/www/xprofile</sourceDirectory>
+    <testSourceDirectory>/opt/local/www/xprofile/app/Test</testSourceDirectory>
+  </build>
+
+  <properties>
+    <sonar.language>php</sonar.language>
+
+    <!-- ************ Optional properties ************ -->
+
+    <!-- Property used for PhpUnit -->
+    <!-- Please note that starting with version 0.6 of the PHP Plugin, using a PhpUnit config file is preferred ("sonar.phpUnit.configuration") -->
+    <sonar.phpUnit.mainTestClass>/opt/local/www/xprofile/app/Test/Case/AllModelTest.php</sonar.phpUnit.mainTestClass>
+
+    <!-- Example of properties that can be uncommented to enable reuse of existing PHP Code Sniffer reports -->
+    <!--
+    <sonar.phpCodesniffer.analyzeOnly>true</sonar.phpCodesniffer.analyzeOnly>
+    <sonar.phpCodesniffer.reportFileRelativePath>../../logs"</sonar.phpCodesniffer.reportFileRelativePath>
+    <sonar.phpCodesniffer.reportFileName>cs-report.xml</sonar.phpCodesniffer.reportFileName>
+    -->
+	<!-- For more properties, go to http://docs.codehaus.org/display/SONAR/PHP+plugin+configuration+options -->
+	<!-- PHP Depend -->
+	<sonar.phpDepend.skip>true</sonar.phpDepend.skip>
+	<!--
+    <sonar.phpDepend.analyzeOnly>true</sonar.phpDepend.analyzeOnly>
+    <sonar.phpDepend.reportFileRelativePath>logs</sonar.phpDepend.reportFileRelativePath>
+    <sonar.phpDepend.reportFileName>pdepend-summary.xml</sonar.phpDepend.reportFileName>
+    -->
+	
+	<!-- PHP Mess Detector -->
+    <sonar.phpPmd.analyzeOnly>true</sonar.phpPmd.analyzeOnly>
+    <sonar.phpPmd.reportFileRelativePath>logs</sonar.phpPmd.reportFileRelativePath>
+    <sonar.phpPmd.reportFileName>pmd.xml</sonar.phpPmd.reportFileName>
+    <!-- For more properties, go to http://docs.codehaus.org/display/SONAR/PHP+plugin+configuration+options -->
+	
+	<!-- PHP Code Sniffer -->
+    <sonar.phpCodesniffer.analyzeOnly>true</sonar.phpCodesniffer.analyzeOnly>
+    <sonar.phpCodesniffer.reportFileRelativePath>logs</sonar.phpCodesniffer.reportFileRelativePath>
+    <sonar.phpCodesniffer.reportFileName>checkstyle.xml</sonar.phpCodesniffer.reportFileName>
+    <!-- For more properties, go to http://docs.codehaus.org/display/SONAR/PHP+plugin+configuration+options -->
+	
+	<!-- PHP Copy Paste Detector -->
+    <sonar.phpcpd.analyzeOnly>true</sonar.phpcpd.analyzeOnly>
+    <sonar.phpcpd.reportFileRelativePath>logs</sonar.phpcpd.reportFileRelativePath>
+    <sonar.phpcpd.reportFileName>pmd-cpd.xml</sonar.phpcpd.reportFileName>
+    <!-- For more properties, go to http://docs.codehaus.org/display/SONAR/PHP+plugin+configuration+options -->
+
+
+	<!-- PHPUnit -->
+	<sonar.phpUnit.analyzeOnly>true</sonar.phpUnit.analyzeOnly>
+    <sonar.phpUnit.reportFileRelativePath>logs</sonar.phpUnit.reportFileRelativePath>
+    <sonar.phpUnit.reportFileName>junit.xml</sonar.phpUnit.reportFileName>
+    
+	
+  </properties>
+
+</project>
