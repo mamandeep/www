@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'cd exmstureg; /usr/local/bin/docker-compose build'
+        sh '/usr/local/bin/docker-compose build'
       }
     }
     stage('Test') {
