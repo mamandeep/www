@@ -31,3 +31,4 @@ services:
       - MYSQL_DATABASE=exmstureg
 volumes:
     mysql_data:
+
