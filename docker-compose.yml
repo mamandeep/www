@@ -30,4 +30,4 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=exmstureg
 volumes:
-    mysql_data: exmstureg.sql
+    mysql_data:
