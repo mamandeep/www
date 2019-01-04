@@ -9,7 +9,7 @@ pipeline {
     stage('Test') {
       steps {
         sh 'mysql -u jenkins -pcakephp_jenkins -e \'DROP DATABASE IF EXISTS jenkins_test; CREATE DATABASE jenkins_test\';'
-        writeFile file: 'app/Config/database.php', text: '''<?php
+        writeFile(file: 'app/Config/database.php', text: '''<?php
 class DATABASE_CONFIG {
     public $test = array(
         \'datasource\' => \'Database/Mysql\',
@@ -29,7 +29,7 @@ class DATABASE_CONFIG {
         \'pidfile\' => \'/var/run/sphinxsearch/searchd.pid\',
         \'binlog_path\' => \'/var/lib/sphinxsearch/data\',
     );
-}'''
+}''')
         sh 'cp app/Config/core.php.template app/Config/core.php'
         sh './app/Console/cake test --stderr app AllTests'
       }
