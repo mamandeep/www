@@ -1,0 +1,6 @@
+mysite:
+  build: ./exmstureg
+  dockerfile: build/Dockerfile
+  container_name: mysite
+  volumes:
+    - ./exmstureg:/var/www/site
