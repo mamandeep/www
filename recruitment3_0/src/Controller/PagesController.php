@@ -1,69 +1,76 @@
 <?php
 /**
- * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
+ * Static content controller.
+ *
+ * This file will render views from views/pages/
+ *
+ * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
- * @link      https://cakephp.org CakePHP(tm) Project
- * @since     0.2.9
- * @license   https://opensource.org/licenses/mit-license.php MIT License
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @link          http://cakephp.org CakePHP(tm) Project
+ * @package       app.Controller
+ * @since         CakePHP(tm) v 0.2.9
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace App\Controller;
 
-use Cake\Core\Configure;
-use Cake\Http\Exception\ForbiddenException;
-use Cake\Http\Exception\NotFoundException;
-use Cake\View\Exception\MissingTemplateException;
+App::uses('AppController', 'Controller');
 
 /**
  * Static content controller
  *
- * This controller will render views from Template/Pages/
+ * Override this controller by placing a copy in controllers directory of an application
  *
- * @link https://book.cakephp.org/3.0/en/controllers/pages-controller.html
+ * @package       app.Controller
+ * @link http://book.cakephp.org/2.0/en/controllers/pages-controller.html
  */
-class PagesController extends AppController
-{
+class PagesController extends AppController {
 
-    /**
-     * Displays a view
-     *
-     * @param array ...$path Path segments.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Http\Exception\ForbiddenException When a directory traversal attempt.
-     * @throws \Cake\Http\Exception\NotFoundException When the view file could not
-     *   be found or \Cake\View\Exception\MissingTemplateException in debug mode.
-     */
-    public function display(...$path)
-    {
-        $count = count($path);
-        if (!$count) {
-            return $this->redirect('/');
-        }
-        if (in_array('..', $path, true) || in_array('.', $path, true)) {
-            throw new ForbiddenException();
-        }
-        $page = $subpage = null;
+/**
+ * This controller does not use a model
+ *
+ * @var array
+ */
+	public $uses = array();
 
-        if (!empty($path[0])) {
-            $page = $path[0];
-        }
-        if (!empty($path[1])) {
-            $subpage = $path[1];
-        }
-        $this->set(compact('page', 'subpage'));
+/**
+ * Displays a view
+ *
+ * @return void
+ * @throws NotFoundException When the view file could not be found
+ *	or MissingViewException in debug mode.
+ */
+	public function display() {
+		$path = func_get_args();
 
-        try {
-            $this->render(implode('/', $path));
-        } catch (MissingTemplateException $exception) {
-            if (Configure::read('debug')) {
-                throw $exception;
-            }
-            throw new NotFoundException();
-        }
-    }
+		$count = count($path);
+		if (!$count) {
+			return $this->redirect('/');
+		}
+		$page = $subpage = $title_for_layout = null;
+
+		if (!empty($path[0])) {
+			$page = $path[0];
+		}
+		if (!empty($path[1])) {
+			$subpage = $path[1];
+		}
+		if (!empty($path[$count - 1])) {
+			$title_for_layout = Inflector::humanize($path[$count - 1]);
+		}
+		$this->set(compact('page', 'subpage', 'title_for_layout'));
+
+		try {
+			$this->render(implode('/', $path));
+		} catch (MissingViewException $e) {
+			if (Configure::read('debug')) {
+				throw $e;
+			}
+			throw new NotFoundException();
+		}
+	}
 }
