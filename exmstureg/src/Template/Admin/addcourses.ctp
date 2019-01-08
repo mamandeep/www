@@ -1,5 +1,7 @@
 <?php 
 	//debug($courses);
+	$countable = $interdisciplinary = ['Yes' => 'Yes', 'No' => 'No'];
+	$coursetype = ['Theory' => 'Theory', 'Lab' => 'Lab', 'Seminar' => 'Seminar'];
 	if(isset($programme_id) && $programme_id > 0) {
 	echo $this->Form->create(count($courses) > 0 ? $courses : null);
 	echo "<table id=\"coursesTable\">";
@@ -31,9 +33,21 @@ if(count($courses) == 0) {
 			 echo "<td>" . $this->Form->input('Courses.'. $count . '.course_code') . "</td>";
 			 echo "<td>" . $this->Form->input('Courses.'. $count . '.credits') . "</td>";
 			 echo "<td>" . $this->Form->input('Courses.'. $count . '.maximum_marks') . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.countable') . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.interdisciplinary') . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.type') . "</td>";
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.countable', ['type' => 'select',
+																			        'multiple' => false,
+																			        'options' => $countable, 
+																			        'empty' => '-Select-',
+																			        'id' => $count . '_countable']) . "</td>";
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.interdisciplinary', ['type' => 'select',
+																			        'multiple' => false,
+																			        'options' => $interdisciplinary, 
+																			        'empty' => '-Select-',
+																			        'id' => $count . '_interdisciplinary']) . "</td>";
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.type', ['type' => 'select',
+																			        'multiple' => false,
+																			        'options' => $coursetype, 
+																			        'empty' => '-Select-',
+																			        'id' => $count . '_coursetype']) . "</td>";
 			 echo "<td>" . $this->Form->input('CoursesOffered.'. $count. '.semester', ['type' => 'select' , 'options' => ['1' => '1','2' => '2','3' => '3','4' => '4'], 'empty' => '-Select-']) . "</td>";
 			 echo "<td><input type=\"button\" id=\"delCourseButton\" value=\"Delete\" onclick=\"deleteRow(this)\" /></td>";
 			 echo "<td><input type=\"button\" id=\"addCoursebutton\" value=\"Add Course\" onclick=\"insRow()\" /></td>";
@@ -52,10 +66,27 @@ else {
 			 echo "<td>" . $this->Form->input('Courses.'. $count . '.name', ['value' => $course['course']['name']]) . "</td>"; 
 			 echo "<td>" . $this->Form->input('Courses.'. $count . '.course_code', ['value' => $course['course']['course_code']]) . "</td>";
 			 echo "<td>" . $this->Form->input('Courses.'. $count . '.credits', ['value' => $course['course']['credits']]) . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.maximum_marks', ['value' => $course['course']['maximum_marks']]) . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.countable', ['value' => $course['course']['countable']]) . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.interdisciplinary', ['value' => $course['course']['interdisciplinary']]) . "</td>";
-			 echo "<td>" . $this->Form->input('Courses.'. $count . '.type', ['value' => $course['course']['type']]) . "</td>";
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.maximum_marks', ['value' => $course['course']['maximum_marks']]) . "</td>"; //$course['course']['countable']
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.countable', ['type' => 'select',
+																			        'multiple' => false,
+																			        'options' => $countable,
+																			        'empty' => '-Select-',
+																			        'default' => $course['course']['countable'],
+																			        'id' => $count . '_countable']) . "</td>";
+			 //['value' => $course['course']['interdisciplinary']
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.interdisciplinary', ['type' => 'select',
+																			        'multiple' => false,
+																			        'options' => $interdisciplinary, 
+																			        'empty' => '-Select-',
+																			        'default' => $course['course']['interdisciplinary'],
+																			        'id' => $count . '_interdisciplinary']) . "</td>";
+			 //['value' => $course['course']['type']
+			 echo "<td>" . $this->Form->input('Courses.'. $count . '.type', ['type' => 'select',
+																			        'multiple' => false,
+																			        'options' => $coursetype, 
+																			        'empty' => '-Select-',
+																			        'default' => $course['course']['type'],
+																			        'id' => $count . '_coursetype']) . "</td>";
 			 echo "<td>" . $this->Form->input('CoursesOffered.'. $count. '.semester', ['type' => 'select' , 'options' => ['1' => '1','2' => '2','3' => '3','4' => '4'], 'selected' => $course['semester']]) . "</td>";
 			 echo "<td><input type=\"button\" id=\"delCourseButton\" value=\"Delete\" onclick=\"deleteRow(this)\" /></td>";
 			 echo "<td><input type=\"button\" id=\"addCoursebutton\" value=\"Add Course\" onclick=\"insRow()\" /></td>";

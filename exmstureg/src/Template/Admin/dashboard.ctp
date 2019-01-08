@@ -133,7 +133,7 @@ td {
    	<table>
    		<tr>
    			<td><?php echo $this->Form->submit('Add Courses', ['name' => 'Add Courses']); ?></td>
-   			<td><?php echo $this->Form->submit('Add Students', ['name' => 'Add Students']); ?></td>
+   			<td><?php echo $this->Form->submit('Add Students to Course', ['name' => 'Add Students']); ?></td>
    			<td><?php echo $this->Form->submit('Add Marks', ['name' => 'Add Marks']); ?></td>
    			<td><?php echo $this->Form->submit('Generate Tabulation Sheet', ['name' => 'Generate Tabulation Sheet']); ?></td>
    			<td><?php echo $this->Form->submit('Generate DMC', ['name' => 'Generate DMC']); ?></td>

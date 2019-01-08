@@ -6,5 +6,8 @@ use Cake\ORM\Entity;
 
 class Uploadfile extends Entity
 {
-
+	protected $_accessible = [
+        '*' => true,
+        'id' => false
+    ];
 }

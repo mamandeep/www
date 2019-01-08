@@ -17,24 +17,24 @@ class UploadfilesTable extends Table
     	$this->displayField('username');
     	$this->primaryKey('id');
     	
-    	$this->belongsTo('Students', [
+    	$this->hasOne('Students', [
 		    'bindingKey' => ['user_id'],
 		    'foreignKey' => ['user_id']
 		]);
     	
     	$this->addBehavior('Josegonzalez/Upload.Upload', [
-    			'excelfile' => [
+    			'photo' => [
     					'fields' => [
     							// if these fields or their defaults exist
     							// the values will be set.
-    							'dir' => 'path', // defaults to `dir`
-    							'size' => 'size', // defaults to `size`
-    							'type' => 'type'
+    							'dir' => 'photo_path', // defaults to `dir`
+    							'size' => 'photo_size', // defaults to `size`
+    							'type' => 'photo_type'
 						] // defaults to `type`
 ,
 						'nameCallback' => function ($data, $settings) {
 							// debug($data); debug($settings);
-							$str = 'cv_' . uniqid () . '_' . $data ['name'];
+							$str = 'photo_' . uniqid () . '_' . $data ['name'];
 							return strtolower ( $str );
 						},
 						'path' => 'webroot{DS}uploads{DS}files{DS}',
@@ -65,17 +65,6 @@ class UploadfilesTable extends Table
                     'message' => 'This file could not be uploaded completely',
                     'provider' => 'upload'
                 ])
-                /*->add('photo', 'custom', [
-                    'rule' => function ($value, $context) {
-                        if(!empty($value)) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    },
-                    'message' => 'There was no file found to upload'
-                ])*/
                 ->add('photo', 'fileSuccessfulWrite', [
                     'rule' => 'isSuccessfulWrite',
                     'message' => 'This upload failed',
@@ -105,7 +94,7 @@ class UploadfilesTable extends Table
                         return !empty($context['data']['photo']) && $context['data']['photo']['error'] == UPLOAD_ERR_OK;
                     }
                 ])
-	    	->allowEmpty('signature')
+	    	/*->allowEmpty('signature')
                 ->add('signature', 'fileUnderPhpSizeLimit', [
                     'rule' => 'isUnderPhpSizeLimit',
                     'message' => 'This file is too large',
@@ -121,18 +110,6 @@ class UploadfilesTable extends Table
                     'message' => 'This file could not be uploaded completely',
                     'provider' => 'upload'
                 ])
-                /*->add('signature', 'custom', [
-                    'rule' => function ($value, $context) {
-                        if(!empty($context['data']['photo'])) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    },
-                    'message' => 'There was no file found to upload',
-                    'provider' => 'upload'
-                ])*/
                 ->add('signature', 'fileSuccessfulWrite', [
                     'rule' => 'isSuccessfulWrite',
                     'message' => 'This upload failed',
@@ -161,7 +138,7 @@ class UploadfilesTable extends Table
                     'on' => function($context) {
                         return !empty($context['data']['signature']) && $context['data']['signature']['error'] == UPLOAD_ERR_OK;
                     }
-                ]);         
+                ])*/;         
     	return $validator;
     }
 }

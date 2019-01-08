@@ -129,6 +129,7 @@ if (file_exists($file)) {
             </a>
             <ul class="treeview-menu">
 		<li><a href="<?php echo $this->Url->build('/admin/dashboard/' . $user['id']); ?>"><i class="fa fa-circle-o"></i> Dashboard</a></li>
+        <li><a href="<?php echo $this->Url->build('/admin/addstudentinfo/' . $user['id']); ?>"><i class="fa fa-circle-o"></i> Add Student</a></li>
                 <?php /* <li><a href="<?php echo $this->Url->build('/schools/index/' . $user['id']); ?>"><i class="fa fa-circle-o"></i> Schools</a></li>
                 <li><a href="<?php echo $this->Url->build('/departments/index/' . $user['id']); ?>"><i class="fa fa-circle-o"></i> Departments</a></li>
                 <li><a href="<?php echo $this->Url->build('/programmes/index/' . $user['id']); ?>"><i class="fa fa-circle-o"></i> Programmes</a></li>

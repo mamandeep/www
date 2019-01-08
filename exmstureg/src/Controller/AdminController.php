@@ -80,7 +80,77 @@ class AdminController extends AppController {
         $this->set('sessions', TableRegistry::get('Sessions')->find('list')->select(['id', 'name'])->order(['Sessions.name' => 'ASC'])->toArray()); 
     }
     
-	
+	public function addstudentinfo() {
+        $studentsTable = TableRegistry::get('Students');
+        $sessionsTable = TableRegistry::get('Sessions');
+        $programmesTable = TableRegistry::get('Programmes');
+        $uploadFilesTable = TableRegistry::get('Uploadfiles');
+        if ($this->request->is(['post', 'put'])) {
+            if(!empty($this->request->getData()['Uploadfiles']['photo']) &&  $this->request->getData()['Uploadfiles']['photo']['error'] == UPLOAD_ERR_NO_FILE) {
+                $this->Flash->error(__('No file chosen for upload'));
+                return null;
+            }
+            $student = $studentsTable->find('all')->where(['Students.registration_no' => $this->request->getData()['Students']['registration_no']])->toArray();
+            $uploadFile = $uploadFilesTable->find('all')->where(['Uploadfiles.registration_no' => $this->request->getData()['Students']['registration_no']])->toArray();
+            if(count($student) == 0) {
+                $student = $studentsTable->newEntity($this->request->getData()['Students']);
+            }
+            else if(count($student) == 1) {
+                $student = $studentsTable->patchEntity($student, $this->request->getData()['Students']);
+            }
+            else if(count($student) > 1){
+                $this->Flash->error(__('There is more than one record of student with same Registration Number. Please contact Support.'));
+                return null;
+            }
+            if(count($uploadFile) == 0) {
+                $uploadFile = $uploadFilesTable->newEntity($this->request->getData()['Uploadfiles']);
+            }
+            else if(count($uploadFile) == 1) {
+                $uploadFile = $uploadFilesTable->patchEntity($uploadFile, $this->request->getData()['Uploadfiles']);
+            }
+            else if(count($uploadFile) > 1) {
+                $this->Flash->error(__('There is more than one record of student photograph. Please contact Support.'));
+                return null;
+            }
+            
+            $student->user_id = $uploadFile->user_id = $this->Auth->user('id');
+            $uploadFile->registration_no = $this->request->getData()['Students']['registration_no'];
+            $flag = true;
+            $studentsTable->connection()->transactional(function () 
+                        use ($studentsTable,$uploadFilesTable,$flag,$student,$uploadFile) {
+                            try {
+                            if($studentsTable->save($student))
+                            {
+                                
+                            }
+                            else {
+                                $flag = false;
+                            }
+                            if($uploadFilesTable->save($uploadFile))
+                            {
+                                
+                            }
+                            else {
+                                $flag = false;
+                            }
+                    }
+                    catch(\Exception $e) {
+                        $this->Flash->error(__('There is an error in saving the student data.' . $e->getMessage()));
+                        $flag = false;
+                        //debug($e->getTrace());
+                    }
+                    if($flag == false) {
+                        throw new \Exception("There was an error in saving the data. Please contact Support.");
+                    }
+                    else {
+                        $this->Flash->success(__('The student information is saved.'));        
+                    }
+            });
+        }
+        $this->set('sessions', $sessionsTable->find('list',['fields' => ['id', 'name']])->toArray());
+        $this->set('programmes', $programmesTable->find('list',['fields' => ['id', 'name']])->toArray());
+    }
+
     public function updatemarksfaculty() {
     	$courseId = intval($this->request->getQuery('course_id'));
     	if($courseId <= 0) {
@@ -1076,7 +1146,8 @@ class AdminController extends AppController {
         																|| $this->request->getParam('action') === 'getsemesters'
         																|| $this->request->getParam('action') === 'generatetablulationsheet'
         																|| $this->request->getParam('action') === 'import'
-        																|| $this->request->getParam('action') === 'pdfview')) {
+        																|| $this->request->getParam('action') === 'pdfview'
+                                                                        || $this->request->getParam('action') === 'addstudentinfo')) {
             return true;
         }
 
