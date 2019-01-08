@@ -1,9 +1,14 @@
 pipeline {
-  agent any
+  agent {
+    dockerfile {
+      filename 'Dockerfile'
+    }
+
+  }
   stages {
     stage('Build') {
       steps {
-        sh '/usr/local/bin/docker-compose build'
+        sh '/usr/local/bin/docker-compose build ./exmstureg/build/'
       }
     }
     stage('Test') {
