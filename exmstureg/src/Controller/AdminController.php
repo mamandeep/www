@@ -416,7 +416,7 @@ class AdminController extends AppController {
     		$this->Flash->error(__('The selected Session or Programme is invalid. Please contact Support.'));
     		return $this->redirect(['action' => 'dashboard']);
     	}
-    	else if($this->request->is(['post', 'put'])) {
+    	else if($this->request->is(['post', 'put']) && !empty($this->request->getData())) {
     		$programme_id = $this->request->getData()['Courses'][0]['programme_id'];
     		//$semester = $this->request->getData()['CoursesOffered'][0]['semester'];
     	}
@@ -424,7 +424,7 @@ class AdminController extends AppController {
     	$coursesTable = TableRegistry::get('Courses');
     	$coursesOffered = $coursesOfferedTable->find('all')->contain(['Courses'])
     												->where(['CoursesOffered.programme_id' => $programme_id])->toArray();
-    	if ($this->request->is(['post', 'put'])) {
+    	if ($this->request->is(['post', 'put']) && !empty($this->request->getData())) {
     		//debug($this->request->getData());
     		$dataWithId = [];
     		$dataWithoutId = [];

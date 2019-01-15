@@ -69,18 +69,28 @@ EOF;
 
 
 		// Logo
-		$this->SetFont('helvetica', 'B', 20);
+		$this->SetFont('times', '', 8);
+		$this->Cell(1, 0, 'Sr. No. 5181', 0, 0, 'L', 0, '', 0);
+		$this->SetTextColor(2, 145, 0);
+		$this->SetFont('times', 'B', 20);
 		$sText = 'Central University of Punjab';
 		$this->Cell(0, 0, 'Central University of Punjab', 0, 1, 'C', 0, '', 0);
-		$this->SetFont('helvetica', '', 8);
+		$this->SetTextColor(0, 0, 0);
+		$this->SetFont('times', '', 8);
 		$this->Cell(0, 0, '(Established vide Act 25(2009) of Parliament)', 0, 1, 'C', 0, '', 0);
-		$this->SetFont('helvetica', 'BI', 12);
+		$this->SetFont('times', 'BI', 12);
 		$this->Cell(0, 0, 'Result-Cum-Detailed Marks/Grades Card', 0, 1, 'C', 0, '', 0);
-		$this->Cell(0, 0, '', 0, 1, 'C', 0, '', 0);
-		$this->SetFont('helvetica', '', 12);
-		$this->Cell(0, 0, (!empty($this->Id8['department']['name']) ? $this->Id8['department']['name'] : "Deparment Not Found"), 0, 1, 'C', 0, '', 0);
-		$this->Cell(0, 0, (!empty($this->Id8['department']['school']['name']) ? $this->Id8['department']['school']['name'] : "School Not Found"), 0, 1, 'C', 0, '', 0);
-
+		//$this->Cell(0, 0, '', 0, 1, 'C', 0, '', 0);
+		$this->SetTextColor(0, 148, 255);
+		$this->SetFont('times', 'B', 12);
+		$this->Cell(0, 0, 'L.L.M', 0, 1, 'C', 0, '', 0);
+		$this->SetTextColor(0, 0, 0);
+		$this->SetFont('times', '', 12);
+		$this->Cell(0, 0, ucwords(strtolower(!empty($this->Id8['department']['name']) ? $this->Id8['department']['name'] : "Deparment Not Found")), 0, 1, 'C', 0, '', 0);
+		$this->Cell(0, 0, ucwords(strtolower(!empty($this->Id8['department']['school']['name']) ? $this->Id8['department']['school']['name'] : "School Not Found")), 0, 1, 'C', 0, '', 0);
+		$this->SetTextColor(0, 148, 255);
+		$this->SetFont('times', 'B', 12);
+		$this->Cell(0, 0, strtoupper('Third Semester Examination December 2018'), 0, 1, 'C', 0, '', 0);
 
 		$dir = new Folder(WWW_ROOT . 'img');
 		//debug($dir); exit;
@@ -117,7 +127,7 @@ EOF;
         	
     	}
     	//debug($this->getPageDimensions()); exit;
-    	$this->Line(PDF_MARGIN_LEFT,50,($this->getPageDimensions()['wk']-PDF_MARGIN_LEFT),50,array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+    	$this->Line(PDF_MARGIN_LEFT,50,($this->getPageDimensions()['wk']-PDF_MARGIN_LEFT),50,array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(2, 145, 0)));
     	//$this->Multicell(0,0,"\n"); 
 		//$this->Ln();
 	}
@@ -184,24 +194,31 @@ EOF;
 			}
 
 			table {
+				width: 100%;
 				border-collapse: collapse;
 				border: none;
 			}
 
 			td {
-				border: 0.2px solid black;
+				border: 0.2px solid #029100;
 			}
 
 			.headertext {
 				font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
 				font-size: 16px;
 				font-weight: bold;
+				text-align: center;
 			}
 
 			.tabletext {
 				font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
 				font-size: 16px;
 				font-weight: none;
+				text-align: center;
+			}
+
+			td.subject {
+				text-align: left;
 			}
 
 			.totaltext {
@@ -218,15 +235,19 @@ EOF;
 				border: none;
 			}
 
+			.rowheight {
+				line-height: 35px;
+			}
+
 		</style>
 
-		<table>
+		<table width="100%">
 			<tr>
-				<td class="headertext">Course Code</td>
-				<td class="headertext">Subject</td>
-				<td class="headertext">Course Credits</td>
-				<td class="headertext">Grade Points</td>
-				<td class="headertext">Letter Grade</td>
+				<td width="12.5%" class="headertext">Course Code</td>
+				<td width="50%" class="headertext">Subject</td>
+				<td width="12.5%" class="headertext">Course Credits</td>
+				<td width="12.5%" class="headertext">Grade Points</td>
+				<td width="12.5%" class="headertext">Letter Grade</td>
 			</tr>
 EOF;
 			//debug($courses); exit;
@@ -235,24 +256,37 @@ EOF;
 			$totalCummulative = 0;
 			//$totalGradePoint = 0;
 			$totalLetterGrade = 0;
-			foreach($courses as $course) {
-				$row = '';
-				$row .= "<tr>";
-				$row .= "<td class=\"tabletext\">" . $course['_matchingData']['Courses']['course_code'] . "</td>";
-				$row .= "<td class=\"tabletext\">" . $course['_matchingData']['Courses']['name'] . "</td>";
-				$row .= "<td class=\"tabletext\">" . $course['_matchingData']['Courses']['credits'] . "</td>";
-				$row .= "<td class=\"tabletext\">" . $course['grade_point'] . "</td>";
-				$row .= "<td class=\"tabletext\">" . $course['letter_grade'] . "</td>";
-				$row .= "</tr>";
-				$html .= $row;
-				$totalCredits += $course['_matchingData']['Courses']['credits'];
-				$totalMarks += is_numeric($course['total']) ? $course['total'] : 0;
-				$totalCummulative += ($course['_matchingData']['Courses']['countable'] == "Yes") ? ((is_numeric($course['total']) ? intval($course['total']) : 0) * intval($course['_matchingData']['Courses']['credits'])) : 0; 
-				//debug($totalCredits); debug($totalCummulative); debug($course['total']);
+			for($i=0;$i<12;$i++) {
+				if(!empty($courses[$i])) {
+					$row = '';
+					$row .= "<tr class=\"rowheight\">";
+					$row .= "<td class=\"tabletext\">" . $courses[$i]['_matchingData']['Courses']['course_code'] . "</td>";
+					$row .= "<td class=\"tabletext subject\">" . $courses[$i]['_matchingData']['Courses']['name'] . "</td>";
+					$row .= "<td class=\"tabletext\">" . $courses[$i]['_matchingData']['Courses']['credits'] . "</td>";
+					$row .= "<td class=\"tabletext\">" . $courses[$i]['grade_point'] . "</td>";
+					$row .= "<td class=\"tabletext\">" . $courses[$i]['letter_grade'] . "</td>";
+					$row .= "</tr>";
+					$html .= $row;
+					$totalCredits += $courses[$i]['_matchingData']['Courses']['credits'];
+					$totalMarks += is_numeric($courses[$i]['total']) ? $courses[$i]['total'] : 0;
+					$totalCummulative += ($courses[$i]['_matchingData']['Courses']['countable'] == "Yes") ? ((is_numeric($courses[$i]['total']) ? intval($courses[$i]['total']) : 0) * intval($courses[$i]['_matchingData']['Courses']['credits'])) : 0;
+					//debug($totalCredits); debug($totalCummulative); debug($course['total']);	
+				}
+				else {
+					$row = '';
+					$row .= "<tr class=\"rowheight\">";
+					$row .= "<td class=\"tabletext\"></td>";
+					$row .= "<td class=\"tabletext\"></td>";
+					$row .= "<td class=\"tabletext\"></td>";
+					$row .= "<td class=\"tabletext\"></td>";
+					$row .= "<td class=\"tabletext\"></td>";
+					$row .= "</tr>";
+					$html .= $row;
+				}
 			}
 			//debug($totalCredits); debug($totalCummulative); debug(bcdiv($totalCummulative,$totalCredits,2)); exit;
-		$html .= '<tr><td></td><td class="totaltext">TOTAL</td><td>'. $totalCredits .'</td><td class="totaltext">' . $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['gp'] . '</td><td class="totaltext">'. $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['lg'] . '</td></tr>';
-		$html .= '<tr class="lastrow"><td colspan="5" class="startext">*Indicates the marks obtained after supplementary Examination held in December 2018</td></tr>';
+		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td>'. $totalCredits .'</td><td class="totaltext">' . $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['gp'] . '</td><td class="totaltext">'. $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['lg'] . '</td></tr>';
+		$html .= '<tr class="lastrow rowheight"><td colspan="5" class="startext">*Indicates the marks obtained after supplementary Examination held in December 2018</td></tr>';
 		$html .= '</table>';
 		$this->writeHTML($html, true, false, true, false, '');
 		$this->Ln();
@@ -269,19 +303,25 @@ EOF;
 			}
 
 			td {
-				border: 0.2px solid black;
+				border: 0.2px solid #0094ff;
 			}
 
 			.headertext {
 				font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
 				font-size: 16px;
 				font-weight: bold;
+				text-align: left;
 			}
 
 			.tabletext {
 				font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
 				font-size: 16px;
 				font-weight: none;
+				text-align: left;
+			}
+
+			td.text {
+				text-align: center;
 			}
 
 			.totaltext {
@@ -301,9 +341,9 @@ EOF;
 		</style>
 EOF;
 		$html .= '<table>';
-		$html .= '<tr><td rowspan="2">Semester Result</td><td>SGPA: '. $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['gp'] .' </td><td>Letter Grade: '. $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['lg'] .'</td><td>Total Credits: ' . $totalCredits . '</td></tr>';
-		$html .= '<tr><td colspan="3">Pass with Letter Grade \'C\' (Average)</td></tr>';
-		$html .= '<tr><td>Cummulative Result</td><td>CGPA:</td><td>Letter Grade:</td><td>Total Credits:</td></tr>';
+		$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['gp'] .' </td><td class="headertext">Letter Grade: '. $marksgplg[bcdiv($totalCummulative,$totalCredits,0)+1]['lg'] .'</td><td class="headertext">Total Credits: ' . $totalCredits . '</td></tr>';
+		$html .= '<tr><td height="40px" class="text" colspan="3">Pass with Letter Grade \'C\' (Average)</td></tr>';
+		$html .= '<tr><td class="headertext">Cummulative Result</td><td class="headertext">CGPA:</td><td class="headertext">Letter Grade:</td><td class="headertext">Total Credits:</td></tr>';
 		$html .= '</table>';
 		$this->writeHTML($html, true, false, true, false, '');
 		

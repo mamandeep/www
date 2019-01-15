@@ -42,7 +42,7 @@ class ExaminationMarksTable extends Table
             ->notEmpty('internal_assessment')
             ->add('internal_assessment', 'comparison', [
             		'rule' => function ($value, $context) {
-            		return (intval($value) >= 0 && intval($value) <= 25);
+            		return (intval($value) >= 0 && intval($value) <= 75);
             		},
             		'message' => 'The IA must be less than 25 and greater than 0.'
            	])
@@ -50,7 +50,7 @@ class ExaminationMarksTable extends Table
             ->notEmpty('end_semester_examination')
             ->add('end_semester_examination', 'comparison', [
             		'rule' => function ($value, $context) {
-            		return (intval($value) >= 0 && intval($value) <= 75);
+            		return (intval($value) >= 0 && intval($value) <= 25);
             		},
             		'message' => 'The ES must be less than 75 and greater than 0.'
             ]);
