@@ -23,6 +23,9 @@ class StudentsTable extends Table
 		    'foreignKey' => ['user_id']
 		]);
         $this->hasMany('ExaminationMarks');
+		$this->hasMany('CoursesOffered')
+			->setForeignKey('programme_id')
+        	->setJoinType('INNER');
         $this->hasMany('CoursesStudents');
         $this->addBehavior('Timestamp', [
         		'events' => [

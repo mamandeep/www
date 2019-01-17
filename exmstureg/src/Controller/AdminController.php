@@ -140,6 +140,7 @@ class AdminController extends AppController {
                         //debug($e->getTrace());
                     }
                     if($flag == false) {
+						//debug($student); debug($uploadFile);
                         throw new \Exception("There was an error in saving the data. Please contact Support.");
                     }
                     else {
@@ -1096,11 +1097,7 @@ class AdminController extends AppController {
     	$registration_no = base64_decode($this->request->getQuery('registration_no'));
         //debug($registration_no);
         $res = TableRegistry::get('ExaminationMarks')->find('all')
-                                                    /*->contain(['Courses' => function ($q) use ($registration_no) {
-                                                        return $q->order(['Courses.course_code' => 'ASC']);
-                                                    } ,'Students' => function(\Cake\ORM\Query $q) use ($registration_no) {
-                                                    return $q->where(['Students.registration_no' => $registration_no]);
-                                                    }])*/
+                                                    ->contain(['Programmes'])
                                                     ->matching('Students', function ($q) use ($registration_no) {
                                                         return $q->where(['registration_no' => $registration_no]);
                                                     })
@@ -1115,13 +1112,21 @@ class AdminController extends AppController {
 
         }
         $Id8 = TableRegistry::get('Programmes')->find()->contain(['Departments' => ['Schools']])->where(['Programmes.id' => $res[0]['_matchingData']['Courses']['programme_id']])->toArray();
+		//debug($res); return null;
         $this->viewBuilder()->layout('ajax');
         $this->set('title', 'My Great Title');
         $this->set('file_name', '2016-06' . '_June_CLM.pdf');
         //debug($data); debug($res); exit;
         $this->set('courses', $res);
         $this->set('Id8', $Id8[0]);
+		$query1 = TableRegistry::get('Students')->find('all')->where(['Students.registration_no' => $registration_no]);
+		$Id6 = $query1->toArray()[0];
+		$subquery1 = TableRegistry::get('CoursesOffered')->find('all')->where(['CoursesOffered.programme_id' => $Id6['programme_id']]);
+		//$this->set('Id6', $Id6);
+		$this->set('Id7', $subquery1->toArray());
+		$Id9 = TableRegistry::get('Uploadfiles')->find('all')->where(['registration_no' => $registration_no])->toArray();
         $this->set('marksgplg', TableRegistry::get('Marksgplg')->find('all')->toArray());
+		$this->set('Id10', $Id9[0]);
         $this->response->type('pdf');
     	
     }

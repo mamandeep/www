@@ -88,7 +88,7 @@ else {
 																			        'default' => $course['course']['type'],
 																			        'id' => $count . '_coursetype']) . "</td>";
 			 echo "<td>" . $this->Form->input('CoursesOffered.'. $count. '.semester', ['type' => 'select' , 'options' => ['1' => '1','2' => '2','3' => '3','4' => '4'], 'selected' => $course['semester']]) . "</td>";
-			 echo "<td><input type=\"button\" id=\"delCourseButton\" value=\"Delete\" onclick=\"deleteRow(this)\" /></td>";
+			echo "<td><input type=\"button\" id=\"delCourseButton\" value=\"Delete\" onclick=\"deleteRow(this)\" /></td>";
 			 echo "<td><input type=\"button\" id=\"addCoursebutton\" value=\"Add Course\" onclick=\"insRow()\" /></td>";
 	   		echo "</tr>";
 	   		$count++;

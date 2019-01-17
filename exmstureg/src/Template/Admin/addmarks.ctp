@@ -8,7 +8,6 @@ echo $this->Form->create((count($examinationMarks) > 0) ? $examinationMarks : nu
 	<td>Father Name</td>
 	<td>Mother Name</td>
 	<td>Registration No.</td>";
-	
 	if($Id3['type'] == "Theory") {
 	echo "<td>Internal Assesment</td>
 		<td>End Semester Examination</td>";
@@ -16,7 +15,7 @@ echo $this->Form->create((count($examinationMarks) > 0) ? $examinationMarks : nu
 	else if($Id3['type'] == "Seminar" || $Id3['type'] == "Lab") {
 		echo "<td>Total</td>";
 	}
-	echo "</tr>";
+	echo "<td>Examination Date</td></tr>";
 ?>
 <?php     $count = 0; //debug($Id3); //debug($students);
 if(isset($students)) {
@@ -38,6 +37,18 @@ foreach($students as $student) {
 			 				else {
 			 					echo "<td>" . $this->Form->control($count.'.total') . "</td>";
 			 				}
+							echo "<td>" . $this->Form->control($count.'.end_semester_examination') . "</td>";
+							echo "<td>" . echo $this->Form->input(
+													$count.'.examination_date', 
+													[
+														'type' => 'select',
+														'multiple' => false,
+														'options' => ['14/12/2018' => '14/12/2018', '14/05/2019' => '14/05/2019'] 
+														'empty' => '-Select-',
+														'id' => 'examination_date',
+														'default' => '14/12/2018'
+													]
+												) . "</td>";
 	   		echo "</tr>";
 	   		$count++;
 	   	}

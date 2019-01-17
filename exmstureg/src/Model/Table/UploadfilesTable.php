@@ -71,12 +71,12 @@ class UploadfilesTable extends Table
                     'provider' => 'upload'
                 ])
                 ->add('photo', 'fileBelowMaxSize', [
-                    'rule' => ['isBelowMaxSize', 51200],
+                    'rule' => ['isBelowMaxSize', 2048000],
                     'message' => 'This file is too large',
                     'provider' => 'upload'
                 ])
                 ->add('photo', 'fileAboveMinSize', [
-                    'rule' => ['isAboveMinSize', 10240],
+                    'rule' => ['isAboveMinSize', 51240],
                     'message' => 'This file is too small',
                     'provider' => 'upload'
                 ])

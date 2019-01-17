@@ -31,7 +31,9 @@ class CoursesOfferedTable extends Table
         $this->belongsTo('Courses')
         	->setForeignKey('course_id')
         	->setJoinType('INNER');
-        	
+		$this->belongsTo('Students')
+        	->setForeignKey('programme_id')
+        	->setJoinType('INNER');
     }
 
     public function validationDefault(Validator $validator)
