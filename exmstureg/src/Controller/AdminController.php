@@ -811,6 +811,7 @@ class AdminController extends AppController {
     	$this->set('examinationMarks', (count($examinationMarks) == 0) ? [$examinationMarksTable->newEntity()] : $examinationMarks);
     	$this->set('students', $students);
     	$this->set('course_id', $course_id);
+		$this->set('Id1', TableRegistry::get('Courses')->find('all')->where(['id' => $course_id])->toArray()[0]);
     }
     
     public function corrections($id = null)

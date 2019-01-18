@@ -343,7 +343,7 @@ EOF;
 				}
 			}
 			//debug($totalCredits); debug($totalCummulative); debug(bcdiv($totalCummulative,$totalCredits,2)); exit;
-		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td>'. $totalCredits .'</td><td class="totaltext">' . bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) . '</td><td class="totaltext">'. $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] . '</td></tr>';
+		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td>'. ($id7 == true) ? "" : $totalCredits .'</td><td class="totaltext">' . ($id7 == true) ? "" :  bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) . '</td><td class="totaltext">'. ($id7 == true) ? "" : $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] . '</td></tr>';
 		if($id7 == true) {
 			$html .= '<tr class="lastrow rowheight"><td colspan="5" class="startext">*Indicates the marks obtained after supplementary Examination held in ' . $this->courses[0]['examination_date'] . '</td></tr>';
 		}

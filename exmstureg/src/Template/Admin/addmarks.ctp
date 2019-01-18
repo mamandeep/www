@@ -1,4 +1,6 @@
 <?php //debug($examinationMarks);
+	echo "<h3>" . $Id1['course_code'] . "</h3>";
+	echo "<h3>" . $Id1['name'] . "</h3>";
 echo $this->Form->create((count($examinationMarks) > 0) ? $examinationMarks : null);
 	echo "<table id=\"examinationMarksTable\">";
 	echo "<tr>
@@ -38,12 +40,12 @@ foreach($students as $student) {
 			 					echo "<td>" . $this->Form->control($count.'.total') . "</td>";
 			 				}
 							echo "<td>" . $this->Form->control($count.'.end_semester_examination') . "</td>";
-							echo "<td>" . echo $this->Form->input(
+							echo "<td>" . $this->Form->input(
 													$count.'.examination_date', 
 													[
 														'type' => 'select',
 														'multiple' => false,
-														'options' => ['14/12/2018' => '14/12/2018', '14/05/2019' => '14/05/2019'] 
+														'options' => ['14/12/2018' => '14/12/2018', '14/05/2019' => '14/05/2019'] ,
 														'empty' => '-Select-',
 														'id' => 'examination_date',
 														'default' => '14/12/2018'
