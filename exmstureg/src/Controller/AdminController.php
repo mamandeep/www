@@ -729,7 +729,17 @@ class AdminController extends AppController {
 											    	->order(['CoursesStudents.student_id' => 'ASC'])
 											    	->toArray();
     	$examinationMarksTable = TableRegistry::get('ExaminationMarks');
-    	$examinationMarks = $examinationMarksTable->find('all')->contain(['Students'])->where(['ExaminationMarks.course_offered_id' => $course_id])->toArray();
+    	$examinationMarks = $examinationMarksTable->find();
+	$Id = $examinationMarks->func()->str_to_date([
+    		'examination_date' => 'identifier',
+    		"'%d/%m/%Y'" => 'literal'
+	]);
+	$examinationMarks->select([
+		'id', 'student_id', 'course_offered_id', 'programme_id','internal_assessment','end_semester_examination','total','grade_point', 'letter_grade',
+    		'ExaminationMarks__examination_date' => $Id,
+		'created_at', 'modified_at', 'user_id'
+	])->contain(['Students'])->where(['ExaminationMarks.course_offered_id' => $course_id])->toArray();
+
     	if ($this->request->is(['post', 'put'])) {
     		//debug($this->request->getData()); 
     		$course_offered_id = 0;
@@ -752,6 +762,9 @@ class AdminController extends AppController {
     			//debug($examinationMarks); return null;
     			for($i = 0; $i < count($examinationMarks); $i++) {
     				//debug($examinationMarks[$i]);
+				$timestamp = strtotime(str_replace('/', '-', $examinationMarks[$i]['examination_date']));
+				$examinationMarks[$i]['examination_date'] = date('Y-m-d H:i:s', $timestamp);
+//				debug($examinationMarks[$i]);
     				if($Id3['type'] == "Theory") {
     					$examinationMarks[$i]['total'] = bcadd($examinationMarks[$i]['internal_assessment'], $examinationMarks[$i]['end_semester_examination'], 0);
     				}
@@ -1113,6 +1126,7 @@ class AdminController extends AppController {
 
         }
         $Id8 = TableRegistry::get('Programmes')->find()->contain(['Departments' => ['Schools']])->where(['Programmes.id' => $res[0]['_matchingData']['Courses']['programme_id']])->toArray();
+	$Id9 = TableRegistry::get('Uploadfiles')->find('all')->where(['Uploadfiles.registration_no' => $registration_no])->toArray();
 		//debug($res); return null;
         $this->viewBuilder()->layout('ajax');
         $this->set('title', 'My Great Title');
@@ -1126,10 +1140,9 @@ class AdminController extends AppController {
 		//$this->set('Id6', $Id6);
 		$this->set('Id7', $subquery1->toArray());
 		$Id9 = TableRegistry::get('Uploadfiles')->find('all')->where(['registration_no' => $registration_no])->toArray();
-        $this->set('marksgplg', TableRegistry::get('Marksgplg')->find('all')->toArray());
-		$this->set('Id10', $Id9[0]);
-        $this->response->type('pdf');
-    	
+        	$this->set('marksgplg', TableRegistry::get('Marksgplg')->find('all')->toArray());
+		$this->set('Id10', count($Id9) > 0 ? $Id9[0] : []);
+        	$this->response->type('pdf');
     }
     
     public function isAuthorized($user = null) {

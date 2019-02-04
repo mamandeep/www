@@ -77,7 +77,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 	transform: rotate(270deg);
 	font-weight: bold;
 	border: 1px solid black;
-	height: 100px;
+	height: 70px;
 	font-family: Arial, Helvetica, sans-serif;
 	text-align: center;
 }
@@ -85,12 +85,14 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 
 
 @media print {
+	
+	.main-footer {
+		display: none;
+	}
+	
 	@page {
 		  size: A4 landscape;
-		  margin-top: 0.2cm;
-		  margin-bottom: 1cm;
-		  margin-left: 1cm;
-		  margin-right: 0.2cm;
+		  margin: 0.1cm;
 		}
     }
 	
@@ -167,7 +169,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 		transform: rotate(270deg);
 		font-weight: bold;
 		border: 1px solid black;
-		height: 100px;
+		height: 70px;
 		font-family: Arial, Helvetica, sans-serif;
 		text-align: center;
 		overflow-wrap: normal;
@@ -177,7 +179,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 		transform: rotate(270deg);
 		font-weight: bold;
 		border: 1px solid black;
-		height: 100px;
+		height: 70px;
 		font-family: Arial, Helvetica, sans-serif;
 		text-align: center;
 		white-space:nowrap;
@@ -233,6 +235,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 	<td colspan="18" class="c0001"><?php echo (empty($marksData[0]['programme']['name']) ? "Undefined" : $marksData[0]['programme']['name']); 
 							$SGPA = []; //$totalCredits = 0;
 							$flags = [];
+							$fail = [];
 							for($i=0; $i < count($marksData); $i++) {
 								//debug($marksData[$i]);
 								$total = ((is_numeric($marksData[$i]['internal_assessment']) && is_numeric($marksData[$i]['end_semester_examination'])) ? round(bcadd($marksData[$i]['internal_assessment'], $marksData[$i]['end_semester_examination'],2)) : round($marksData[$i]['total']));
@@ -249,6 +252,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 										//debug($temp);
 									}
 									$flags[$marksData[$i]['student_id']] = $temp;
+									$fail[$marksData[$i]['student_id']] = (!empty($fail[$marksData[$i]['student_id']]) ? $fail[$marksData[$i]['student_id']] : 0) + (!empty($fail[$marksData[$i]['student_id']]) ? $fail[$marksData[$i]['student_id']] : 1);
 								}
 								//debug($SGPA);
 							}
@@ -314,7 +318,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 		}
 		foreach($listCoursesId as $key => $value) {
 			if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key])) {
-				echo "<td class=\"c0305\">" . (($value['type'] == "Theory") ? $listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'] : "-") . "</td>";
+				echo "<td " . ($value['type'] != "Theory" ? "rowspan='2'" : "") . " class=\"c0305\">" . (($value['type'] == "Theory") ? $listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'] : $listCoursesStudents[$marksData[$i]['student_id']][$key]['total']) .  "</td>";
 			}
 			else {
 				echo "<td class=\"c0305\">&nbsp;</td>";
@@ -325,7 +329,7 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 		} //debug($marksData[$i]['student_id']);
 	?>
 	<td rowspan="3" class="c0317"><?php echo (isset($flags[$marksData[$i]['student_id']]) ? "-" : (($SGPA[$marksData[$i]['student_id']] == 0) ? "" : number_format(round(bcdiv(bcdiv($SGPA[$marksData[$i]['student_id']], $totalCredits, 2),10,3),2),2))); ?></td>
-	<td rowspan="5" class="c0318"><?php if(isset($flags[$marksData[$i]['student_id']])) {
+	<td rowspan="5" class="c0318"><?php $id15 = (!empty($fail[$marksData[$i]['student_id']]) && is_numeric($fail[$marksData[$i]['student_id']]) ? (0.5 < $fail[$marksData[$i]['student_id']]/count($listCoursesId) ?  false : true) : true); if(isset($flags[$marksData[$i]['student_id']]) && $id15 == true) {
 											echo "Reappear in ";
 											foreach($listCoursesId as $key => $value) {
 												if(isset($marksData[$i]) && in_array($key, $flags[$marksData[$i]['student_id']])) {
@@ -333,11 +337,14 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 												}
 											}
 										}	
-										else if($SGPA[$marksData[$i]['student_id']] > 0) {
+										else if($SGPA[$marksData[$i]['student_id']] > 0 && $id15 == true) {
 											echo $class[bcdiv($SGPA[$marksData[$i]['student_id']], $totalCredits, 0)+1];
 										}
+										else if($id15 == false) {
+											echo "<label style='font-weight: bold; color: red'>Fail</label>"; 
+										}
 										else {
-											echo ""; 
+											echo "";
 										}
 										?></td>
 </tr>
@@ -348,11 +355,13 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 			exit;
 		}
 		foreach($listCoursesId as $key => $value) {
-			if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key])) {
-				echo "<td class=\"c0403\">" . (($value['type'] == "Theory") ? $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'] : "-") . "</td>";
-			}
-			else {
-				echo "<td class=\"c0403\">&nbsp;</td>";
+			if($value['type'] == "Theory") {
+				if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key])) {
+					echo "<td class=\"c0403\">" . $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'] . "</td>";
+				}
+				else {
+					echo "<td class=\"c0403\">&nbsp;</td>";
+				}
 			}
 		}
 		for($j=0;$j<(13-count($listCoursesId)); $j++) {
@@ -464,23 +473,15 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 </tr>
 </table>
 <br/>
-</br/>
 <br/>
 <table>
 	<tr>
-		<td>Prepared by:</td>
-		<td></td>
-		<td>Checked by:</td>
-		<td></td>
-		<td>Verified by:</td>
-		<td></td>
-		<td>HoD/O.HoD:</td>
-		<td></td>
-		<td>Dean/Asso. Dean:</td>
-		<td></td>
-		<td>COE:</td>
-		<td></td>
+		<td>Prepared by</td>
+		<td>Checked by</td>
+		<td>Verified by</td>
+		<td>HoD/O.HoD</td>
+		<td>Dean/Asso. Dean</td>
+		<td>Controller of Examinations</td>
+		<td width="10px"></td>
 	</tr>
 </table>
-<br/>
-<br/>

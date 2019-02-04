@@ -88,31 +88,6 @@
 
             <?php echo $this->Flash->render(); ?>
             <?php echo $this->Flash->render('auth'); ?>
-            <?php   if(isset($user) && !empty($user['id'])) { 
-                    //debug($this->request->getParam('controller')); debug($this->request->getParam('action'));
-                    echo "<div align=\"center\" width=\"100%\" style=\"padding: 20px\">";
-                        if(isset($params) && $this->request->getParam('controller') == "Students" && $this->request->getParam('action') == "msfStep") {
-                            for ($i=1; $i <= $params['steps']; $i++) {
-
-                               if ($i > $params['maxProgress'] + 1) {
-                                       echo '<div class="hr">&nbsp;</div><div style="display:inline-block;">Step '.$i.'</div>';
-                               } else {
-                                       $class = ($i == $params['currentStep']) ? 'active' : 'normal';
-                                       if($i != 1){
-                                           echo "<div class=\"hr\">&nbsp;</div>";
-                                       }
-                                       echo "<div style=\"display:inline-block;\">";
-                                       echo $this->Html->link('Step '.$i,
-                                               array('action' => 'msf_step', $i),
-                                               array('class' => $class)
-                                       );
-                                       echo "</div>";
-                               }
-                            }
-                        }
-                    echo "</div>";
-            }
-            ?>
             <?php echo $this->fetch('content'); ?>
 
         </div>

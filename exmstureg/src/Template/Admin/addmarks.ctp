@@ -39,7 +39,6 @@ foreach($students as $student) {
 			 				else {
 			 					echo "<td>" . $this->Form->control($count.'.total') . "</td>";
 			 				}
-							echo "<td>" . $this->Form->control($count.'.end_semester_examination') . "</td>";
 							echo "<td>" . $this->Form->input(
 													$count.'.examination_date', 
 													[

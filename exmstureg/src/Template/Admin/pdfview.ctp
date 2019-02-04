@@ -134,13 +134,23 @@ EOF;
 		$dir2 = new Folder(WWW_ROOT . 'uploads\files');
 		//debug($dir); exit;
 		$file = $dir->find('cup_logo.jpg', true);
-		$file2 = $dir2->find($this->Id10['photo'], true);
+		$file2 = null;
+		if(count($this->Id10) > 0) {
+			$file2 = $dir2->find($this->Id10['photo'], true);
+		}
 		$file = new File($dir->pwd() . DS . $file[0]);
-		$file2 = new File($dir2->pwd() . DS . $file2[0]);
+		if(!empty($file2)) {
+			$file2 = new File($dir2->pwd() . DS . $file2[0]);
+		}
 		//debug($this->Id10); debug($file); exit;
 		//$image_file = $this->request->webroot . 'AdminLTE./img/cup_logo.png';
-		$this->Image('@'.file_get_contents($file->path), 10, 20, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-		$this->Image('@'.file_get_contents($file2->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 20, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+		$this->Image('@'.file_get_contents($file->path), 10, 15, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+		if(!empty($file2)) {
+			$this->Image('@'.file_get_contents($file2->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 15, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+		}
+		else {
+			$this->Image('@'.file_get_contents($file->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 15, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+		}
 		$file->close();
 		$style = array(
 		    'border' => 2,
@@ -153,7 +163,7 @@ EOF;
 		);
 
 		// QRCODE,H : QR-CODE Best error correction
-		$this->write2DBarcode('www.cup.edu.in', 'QRCODE,H', $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-10, 10, 10, 10, $style, 'N');
+		$this->write2DBarcode('www.cup.edu.in', 'QRCODE,H', $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-10, 5, 10, 10, $style, 'N');
 		//$this->Cell(0, 100, '&nbsp', 'T', 0, 'L');
 		
 		//debug($image_file); exit;
@@ -279,6 +289,12 @@ EOF;
 			.rowheight {
 				line-height: 35px;
 			}
+			
+			.failed {
+				text-align: center;
+				font-weight: bold;
+				color: red;		
+			}
 
 		</style>
 
@@ -297,8 +313,12 @@ EOF;
 			$totalCummulative = 0;
 			//$totalGradePoint = 0;
 			$totalLetterGrade = 0;
+			$fail = [];
+			$id90 = [];
+			$totalCourses = 0;
 			$id7 = false;
 			for($i=0;$i<12;$i++) {
+				//debug($courses[$i]);
 				if(!empty($courses[$i])) {
 					$id4 = "";
 					if(!empty($courses[$i]['internal_assessment']) && !empty($courses[$i]['end_semester_examination']) && $courses[$i]['internal_assessment'] != 0 && $courses[$i]['end_semester_examination'] != 0) {
@@ -328,7 +348,21 @@ EOF;
 					$totalCredits += $courses[$i]['_matchingData']['Courses']['credits'];
 					$totalMarks += is_numeric($courses[$i]['total']) ? $courses[$i]['total'] : 0;
 					$totalCummulative += ($courses[$i]['_matchingData']['Courses']['countable'] == "Yes") ? ((is_numeric($courses[$i]['total']) ? round(bcadd($courses[$i]['internal_assessment'], $courses[$i]['end_semester_examination'], 2),0) : 0) * intval($courses[$i]['_matchingData']['Courses']['credits'])) : 0;
-					//debug($totalCredits); debug($totalCummulative); debug($course['total']);	
+					//debug($totalCredits); debug($totalCummulative); debug($course['total']);
+					if((is_numeric($courses[$i]['total']) && $courses[$i]['internal_assessment'] > 0 && round(bcadd($courses[$i]['internal_assessment'], $courses[$i]['end_semester_examination'], 2),0) < 40) || ($courses[$i]['internal_assessment'] == 0 && $courses[$i]['total'] < 40)) {
+						$fail[$courses[$i]['student_id']] = (!empty($fail[$courses[$i]['student_id']]) ? $fail[$courses[$i]['student_id']] : 0) + 1;
+						if(!empty($id90[$courses[$i]['student_id']]) && count($id90[$courses[$i]['student_id']]) > 0 && !in_array($courses[$i]['_matchingData']['Courses']['course_code'], $id90[$courses[$i]['student_id']])) {
+							$temp = (!empty($id90[$courses[$i]['student_id']]) && count($id90[$courses[$i]['student_id']]) > 0) ? $id90[$courses[$i]['student_id']] : [];
+							$temp[] = $courses[$i]['_matchingData']['Courses']['course_code'];
+							$id90[$courses[$i]['student_id']] = $temp;
+						}
+						else {
+							$id90[$courses[$i]['student_id']] = [$courses[$i]['_matchingData']['Courses']['course_code']];
+						}
+						//debug($courses[$i]);
+						//debug($id90);
+					}
+					$totalCourses += ($courses[$i]['_matchingData']['Courses']['countable'] == "Yes") ? 1 : 0;
 				}
 				else {
 					$row = '';
@@ -342,8 +376,7 @@ EOF;
 					$html .= $row;
 				}
 			}
-			//debug($totalCredits); debug($totalCummulative); debug(bcdiv($totalCummulative,$totalCredits,2)); exit;
-		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td>'. ($id7 == true) ? "" : $totalCredits .'</td><td class="totaltext">' . ($id7 == true) ? "" :  bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) . '</td><td class="totaltext">'. ($id7 == true) ? "" : $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] . '</td></tr>';
+		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td>'. (($id7 == true) ? "" : $totalCredits) .'</td><td class="totaltext">' . (($id7 == true) ? "" :  bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2)) . '</td>'. (($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] == "F") ? ('<td class="totaltext failed">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg']) : ('<td class="totaltext">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'])) . '</td></tr>';
 		if($id7 == true) {
 			$html .= '<tr class="lastrow rowheight"><td colspan="5" class="startext">*Indicates the marks obtained after supplementary Examination held in ' . $this->courses[0]['examination_date'] . '</td></tr>';
 		}
@@ -397,18 +430,39 @@ EOF;
 				text-align: center;
 				border: none;
 			}
+			
+			.failed {
+				text-align: center;
+				font-weight: bold;
+				color: red;		
+			}
 
 		</style>
 EOF;
 		$html .= '<table>';
-		$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) .' </td><td class="headertext">Letter Grade: '. $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] .'</td><td class="headertext">Total Credits: ' . $totalCredits . '</td></tr>';
-		$html .= '<tr><td height="40px" class="text" colspan="3">Pass with Letter Grade \'C\' (Average)</td></tr>';
+		if($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] == 'F') {
+			$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) .' </td><td class="headertext failed">Letter Grade: '. $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] . '</td><td class="headertext">Total Credits: ' . $totalCredits . '</td></tr>';	
+		}
+		else {
+			$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) .' </td><td class="headertext">Letter Grade: '. $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] .'</td><td class="headertext">Total Credits: ' . $totalCredits . '</td></tr>';
+		}
+		//debug($id90);		
+		$Id18 = "";
+		if(is_array($id90[$courses[0]['student_id']]) && count($id90[$courses[0]['student_id']]) > 0) {
+			foreach($id90[$courses[0]['student_id']] as $idIter) {
+				$Id18 .= $idIter . ",";
+			}
+		}
+		//debug($Id18);
+		$html .= ((!empty($fail[$courses[0]['student_id']]) && (0.9 < $fail[$courses[0]['student_id']]/$totalCourses)) ? '<tr><td height="40px" class="failed" colspan="3">Fail' : ((!empty($Id18)) ?  ('<tr><td height="40px" class="text" colspan="3">Reappear in ' . $Id18) : ($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['class'] == "Fail" ? '<tr><td height="40px" class="failed" colspan="3">Fail' : '<tr><td height="40px" class="text" colspan="3">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['class'])))
+			. '</td></tr>';
 		$html .= '<tr><td class="headertext">Cummulative Result</td><td class="headertext">CGPA:</td><td class="headertext">Letter Grade:</td><td class="headertext">Total Credits:</td></tr>';
 		$html .= '</table>';
-		$this->writeHTML($html, true, false, true, false, '');
+		//debug($fail[$courses[0]['student_id']]/$totalCourses);
+		//$this->writeHTML($html, true, false, true, false, '');
 		
 		//debug($html); exit;
-		//$this->writeHTML($html, true, false, true, false, '');
+		$this->writeHTML($html, true, false, true, false, '');
     }
 }
 
