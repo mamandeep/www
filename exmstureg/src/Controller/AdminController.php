@@ -1126,12 +1126,12 @@ class AdminController extends AppController {
 
         }
         $Id8 = TableRegistry::get('Programmes')->find()->contain(['Departments' => ['Schools']])->where(['Programmes.id' => $res[0]['_matchingData']['Courses']['programme_id']])->toArray();
-	$Id9 = TableRegistry::get('Uploadfiles')->find('all')->where(['Uploadfiles.registration_no' => $registration_no])->toArray();
+	   $Id9 = TableRegistry::get('Uploadfiles')->find('all')->where(['Uploadfiles.registration_no' => $registration_no])->toArray();
 		//debug($res); return null;
         $this->viewBuilder()->layout('ajax');
         $this->set('title', 'My Great Title');
         $this->set('file_name', '2016-06' . '_June_CLM.pdf');
-        //debug($data); debug($res); exit;
+        //debug($res); exit;
         $this->set('courses', $res);
         $this->set('Id8', $Id8[0]);
 		$query1 = TableRegistry::get('Students')->find('all')->where(['Students.registration_no' => $registration_no]);
