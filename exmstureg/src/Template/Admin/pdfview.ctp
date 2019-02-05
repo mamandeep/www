@@ -96,8 +96,8 @@ EOF;
 		$this->Cell(0, 0, $name, 0, 1, 'C', 0, '', 0);
 		$this->SetTextColor(0, 0, 0);
 		$this->SetFont('times', '', 12);
-		$this->Cell(0, 0, ucwords(strtolower(!empty($this->Id8['department']['name']) ? $this->Id8['department']['name'] : "Deparment Not Found")), 0, 1, 'C', 0, '', 0);
-		$this->Cell(0, 0, ucwords(strtolower(!empty($this->Id8['department']['school']['name']) ? $this->Id8['department']['school']['name'] : "School Not Found")), 0, 1, 'C', 0, '', 0);
+		$this->Cell(0, 0, (!empty($this->Id8['department']['name']) ? $this->Id8['department']['name'] : "Deparment Not Found"), 0, 1, 'C', 0, '', 0);
+		$this->Cell(0, 0, (!empty($this->Id8['department']['school']['name']) ? $this->Id8['department']['school']['name'] : "School Not Found"), 0, 1, 'C', 0, '', 0);
 		$this->SetTextColor(0, 148, 255);
 		$this->SetFont('times', 'B', 12);
 		$semesters = [];
@@ -144,12 +144,12 @@ EOF;
 		}
 		//debug($this->Id10); debug($file); exit;
 		//$image_file = $this->request->webroot . 'AdminLTE./img/cup_logo.png';
-		$this->Image('@'.file_get_contents($file->path), 10, 15, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+		$this->Image('@'.file_get_contents($file->path), 10, 15, 15, 19.5, 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
 		if(!empty($file2)) {
-			$this->Image('@'.file_get_contents($file2->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 15, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+			$this->Image('@'.file_get_contents($file2->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 15, 15, 19.5, 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
 		}
 		else {
-			$this->Image('@'.file_get_contents($file->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 15, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+			$this->Image('@'.file_get_contents($file->path), $this->getPageDimensions()['wk']-PDF_MARGIN_LEFT-15, 15, 15, 19.5, 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
 		}
 		$file->close();
 		$style = array(
@@ -208,6 +208,15 @@ EOF;
 		$this->Cell(($this->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Date: '. date("d.m.Y"), 0, 0, 'L', 0, '', 0);
 		$this->Ln();
 		$this->Cell(($this->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Bathinda', 0, 0, 'L', 0, '', 0);
+		$dir = new Folder(WWW_ROOT . 'img');
+		$dir2 = new Folder(WWW_ROOT . 'uploads\files');
+		//debug($dir); exit;
+		$file = $dir->find('round_logo.jpg', true);
+		$file = new File($dir->pwd() . DS . $file[0]);
+		//debug($this->Id10); debug($file); exit;
+		//$image_file = $this->request->webroot . 'AdminLTE./img/cup_logo.png';
+		//debug($this->getPageDimensions()); exit;
+		$this->Image('@'.file_get_contents($file->path), ($this->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT+20)/4, ($this->getPageDimensions()['hk']- $this->getPageDimensions()['bm'] + 2), 20, 20, 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
 		$this->SetFont('helvetica', 'B', 12);
 		$this->Cell(3*($this->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Controller of Examinations', 0, 0, 'R', 0, '', 0);
 		$this->Ln();
@@ -237,6 +246,24 @@ EOF;
     }
 
     public function SetupTable($courses, $marksgplg) {
+    	$this->SetAlpha(0.2);
+    	$bMargin = $this->getBreakMargin();
+
+        // Get current auto-page-break mode
+        $auto_page_break = $this->AutoPageBreak;
+
+        // Disable auto-page-break
+        $this->SetAutoPageBreak(false, 0);
+    	$dir = new Folder(WWW_ROOT . 'img');
+		//debug($dir); exit;
+		$file = $dir->find('cup_logo.jpg', true);
+		$file = new File($dir->pwd() . DS . $file[0]);
+		$this->Image('@'.file_get_contents($file->path), ($this->getPageDimensions()['wk'] - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT+20)/4 , ($this->getPageDimensions()['bm'] + 60), 100, 100, 'JPG', '', '', false, 300, '', false, false);
+		$this->SetAutoPageBreak($auto_page_break, $bMargin);
+
+        // Set the starting point for the page content
+        $this->setPageMark();
+    	$this->SetAlpha(1);
     	$html = <<<EOF
     	<style type="text/css">
 			img {
@@ -276,6 +303,13 @@ EOF;
 				font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
 				font-size: 16px;
 				font-weight: bold;
+			}
+
+			.totaltextvalue {
+				font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
+				font-size: 16px;
+				font-weight: bold;
+				text-align: center;
 			}
 
 			.startext {
@@ -318,23 +352,27 @@ EOF;
 			$totalCourses = 0;
 			$id7 = false;
 			for($i=0;$i<12;$i++) {
+				$id17 = "";
 				//debug($courses[$i]);
 				if(!empty($courses[$i])) {
 					$id4 = "";
 					if(!empty($courses[$i]['internal_assessment']) && !empty($courses[$i]['end_semester_examination']) && $courses[$i]['internal_assessment'] != 0 && $courses[$i]['end_semester_examination'] != 0) {
-						$id4 = round(bcdiv(bcadd($courses[$i]['internal_assessment'], $courses[$i]['end_semester_examination'], 2),10,2),1);
+						$id4 = number_format(round(bcdiv(bcadd($courses[$i]['internal_assessment'], $courses[$i]['end_semester_examination'], 2),10,2),1),1);
 						//debug($id4);
-						$id7 = (round(bcadd($courses[$i]['internal_assessment'], $courses[$i]['end_semester_examination'], 2)) < 40 && $id7 == false) ? true : false;
+						$id7 = (round(bcadd($courses[$i]['internal_assessment'], $courses[$i]['end_semester_examination'], 2)) < 40) ? true : ($id7 == true) ? true : false;
+						$id17 = "1";
 					}
 					else if(is_numeric($courses[$i]['total'])) {
-						$id4 = round(bcdiv($courses[$i]['total'], 10, 2), 1);
+						$id4 = number_format(round(bcdiv($courses[$i]['total'], 10, 2), 1), 1);
 						//debug($id4);
-						$id7 = ($id4 < 40 && $id7 == false) ? true : false;
+						$id7 = ($courses[$i]['total'] < 40) ? true :  ($id7 == true) ? true : false;
+						$id17 = "2";
 					}
-					else {
+					else if(!is_numeric($courses[$i]['total'])) {
 						$id4 = $courses[$i]['total'];
 						//debug($id4);
-						$id7 = ($id4 == 'US' && $id7 == false) ? true : false;
+						$id7 = ($courses[$i]['total'] == 'US') ? true :  ($id7 == true) ? true : false;
+						$id17 = "3";
 					}
 					$row = '';
 					$row .= "<tr class=\"rowheight\">";
@@ -342,7 +380,11 @@ EOF;
 					$row .= "<td class=\"tabletext subject\">" . $courses[$i]['_matchingData']['Courses']['name'] . "</td>";
 					$row .= "<td class=\"tabletext\">" . $courses[$i]['_matchingData']['Courses']['credits'] . "</td>";
 					$row .= "<td class=\"tabletext\">" . $id4 . "</td>";
-					$row .= "<td class=\"tabletext\">" . $courses[$i]['letter_grade'] . "</td>";
+					$row .= "<td class=\"tabletext\">" . 
+							(($id17 == "1") ? $marksgplg[round(bcadd($courses[$i]['internal_assessment'],$courses[$i]['end_semester_examination'],2))]['lg'] :
+							 (($id17 == "2") ? $marksgplg[round($courses[$i]['total'])]['lg'] :  
+							 ($id17 == "3") ? $courses[$i]['total'] : "-"))
+								. "</td>";
 					$row .= "</tr>";
 					$html .= $row;
 					$totalCredits += $courses[$i]['_matchingData']['Courses']['credits'];
@@ -376,7 +418,8 @@ EOF;
 					$html .= $row;
 				}
 			}
-		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td>'. (($id7 == true) ? "" : $totalCredits) .'</td><td class="totaltext">' . (($id7 == true) ? "" :  bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2)) . '</td>'. (($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] == "F") ? ('<td class="totaltext failed">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg']) : ('<td class="totaltext">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'])) . '</td></tr>';
+
+		$html .= '<tr class="rowheight"><td></td><td class="totaltext">TOTAL</td><td class="totaltextvalue">'. (($id7 == true) ? "-" : $totalCredits) .'</td><td class="totaltextvalue">' . (($id7 == true) ? "-" :  bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2)) . '</td><td class="totaltextvalue">'. (($id7 == true) ? "-" : $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg']) . '</td></tr>';
 		if($id7 == true) {
 			$html .= '<tr class="lastrow rowheight"><td colspan="5" class="startext">*Indicates the marks obtained after supplementary Examination held in ' . $this->courses[0]['examination_date'] . '</td></tr>';
 		}
@@ -440,8 +483,8 @@ EOF;
 		</style>
 EOF;
 		$html .= '<table>';
-		if($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] == 'F') {
-			$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) .' </td><td class="headertext failed">Letter Grade: '. $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] . '</td><td class="headertext">Total Credits: ' . $totalCredits . '</td></tr>';	
+		if($id7 == true) {
+			$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. "-" .' </td><td class="headertext failed">Letter Grade: '. "-" . '</td><td class="headertext">Total Credits: ' . "-" . '</td></tr>';	
 		}
 		else {
 			$html .= '<tr><td class="headertext" rowspan="2">Semester Result</td><td>SGPA: '. bcdiv(bcdiv($totalCummulative,$totalCredits,2),10,2) .' </td><td class="headertext">Letter Grade: '. $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['lg'] .'</td><td class="headertext">Total Credits: ' . $totalCredits . '</td></tr>';
@@ -454,7 +497,7 @@ EOF;
 			}
 		}
 		//debug($Id18);
-		$html .= ((!empty($fail[$courses[0]['student_id']]) && (0.9 < $fail[$courses[0]['student_id']]/$totalCourses)) ? '<tr><td height="40px" class="failed" colspan="3">Fail' : ((!empty($Id18)) ?  ('<tr><td height="40px" class="text" colspan="3">Reappear in ' . $Id18) : ($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['class'] == "Fail" ? '<tr><td height="40px" class="failed" colspan="3">Fail' : '<tr><td height="40px" class="text" colspan="3">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['class'])))
+		$html .= ((!empty($fail[$courses[0]['student_id']]) && (0.5 < $fail[$courses[0]['student_id']]/$totalCourses)) ? '<tr><td height="40px" class="failed" colspan="3">Fail' : ((!empty($Id18)) ?  ('<tr><td height="40px" class="text" colspan="3">Reappear in ' . $Id18) : ($marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['class'] == "Fail" ? '<tr><td height="40px" class="failed" colspan="3">Fail' : '<tr><td height="40px" class="text" colspan="3">' . $marksgplg[round(bcdiv($totalCummulative,$totalCredits,2))+1]['class'])))
 			. '</td></tr>';
 		$html .= '<tr><td class="headertext">Cummulative Result</td><td class="headertext">CGPA:</td><td class="headertext">Letter Grade:</td><td class="headertext">Total Credits:</td></tr>';
 		$html .= '</table>';
@@ -553,20 +596,21 @@ $pdf->Multicell(0,30,"\n");
 $pdf->SetFont('helvetica', '', 12);
 $pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Name:', 0, 0, 'L', 0, '', 0);
 $pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Dharmendra Kumar', 0, 0, 'L', 0, '', 0);
+$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, $courses[0]['_matchingData']['Students']['name'], 0, 0, 'L', 0, '', 0);
 $pdf->SetFont('helvetica', '', 12);
 $pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Reg. No.:', 0, 0, 'L', 0, '', 0);
 $pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, '16mslshg14', 0, 0, 'L', 0, '', 0);
+$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, $courses[0]['_matchingData']['Students']['registration_no'], 0, 0, 'L', 0, '', 0);
 $pdf->Ln();
 $pdf->SetFont('helvetica', '', 12);
 $pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Father\'s Name:', 0, 0, 'L', 0, '', 0);
 $pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Rambali Das', 0, 0, 'L', 0, '', 0);
+$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, $courses[0]['_matchingData']['Students']['father_name'], 0, 0, 'L', 0, '', 0);
 $pdf->SetFont('helvetica', '', 12);
 $pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Mother\'s Name:', 0, 0, 'L', 0, '', 0);
 $pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, 'Asha Devi', 0, 0, 'L', 0, '', 0);
+$pdf->Cell(($pdf->getPageDimensions()['wk']- PDF_MARGIN_LEFT -PDF_MARGIN_RIGHT)/4, 0, $courses[0]['_matchingData']['Students']['mother_name'], 0, 0, 'L', 0, '', 0);
+
 //debug("here4");
 $pdf->Ln();
 $pdf->Ln();

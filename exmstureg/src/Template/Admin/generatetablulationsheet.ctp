@@ -252,7 +252,17 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 										//debug($temp);
 									}
 									$flags[$marksData[$i]['student_id']] = $temp;
-									$fail[$marksData[$i]['student_id']] = (!empty($fail[$marksData[$i]['student_id']]) ? $fail[$marksData[$i]['student_id']] : 0) + (!empty($fail[$marksData[$i]['student_id']]) ? $fail[$marksData[$i]['student_id']] : 1);
+									$fail[$marksData[$i]['student_id']] = (!empty($fail[$marksData[$i]['student_id']]) ? $fail[$marksData[$i]['student_id']] : 0) + 1;
+								}
+								else if(!is_numeric($marksData[$i]['total']) && $marksData[$i]['total'] == "US") {
+									$temp = !empty($flags[$marksData[$i]['student_id']]) ? $flags[$marksData[$i]['student_id']] : [];
+									if(!empty($marksData[$i]['course']['id']) && !in_array($marksData[$i]['course']['id'], $temp)) {
+										array_push($temp,$marksData[$i]['course']['id']);
+										//debug($temp);
+									}
+
+									$flags[$marksData[$i]['student_id']] = $temp;
+									$fail[$marksData[$i]['student_id']] = (!empty($fail[$marksData[$i]['student_id']]) ? $fail[$marksData[$i]['student_id']] : 0) + 1;
 								}
 								//debug($SGPA);
 							}
@@ -394,20 +404,43 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 			echo "Error of columns in IA";
 			exit;
 		}
+		//debug($listLG); exit;
 		foreach($listCoursesId as $key => $value) {
 			//debug($listCoursesStudents[$marksData[$i]['student_id']][$key]);
 			//debug($key);
-			if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) && !empty($listCoursesStudents[$marksData[$i]['student_id']][$key]['letter_grade'])) {
-				if($listCoursesStudents[$marksData[$i]['student_id']][$key]['letter_grade'] == 'F') {
-					echo "<td class=\"c0603\" style=\"color: red;\">" . $listCoursesStudents[$marksData[$i]['student_id']][$key]['letter_grade'] . "</td>";
+			if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) 
+				&& !empty($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment']) 
+				&& !empty($listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'])
+				&& $listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'] != 0
+				&& $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'] != 0) {
+
+					if($listLG[round(bcadd($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'], $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'], 2))+1] == "F") {
+					echo "<td class=\"c0603\" style=\"color: red;\">" . $listLG[round(bcadd($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'], $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'], 2))+1] . "</td>";
+					}
+					else {
+						echo "<td class=\"c0603\">" . $listLG[round(bcadd($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'], $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'], 2))+1] . "</td>";	
+					}
+				}
+				else if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) && is_numeric($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'])) {
+					if($listLG[($listCoursesStudents[$marksData[$i]['student_id']][$key]['total']+1)] == "F") {
+						echo "<td class=\"c0603\" style=\"color: red;\">" . $listLG[($listCoursesStudents[$marksData[$i]['student_id']][$key]['total']+1)] . "</td>";	
+					}
+					else {
+						echo "<td class=\"c0603\">" . $listLG[($listCoursesStudents[$marksData[$i]['student_id']][$key]['total']+1)] . "</td>";
+					}
+					
+				}
+				elseif(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) && !is_numeric($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'])) {
+					if($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'] == "US") {
+						echo "<td class=\"c0603\" style=\"color: red;\">" . $listCoursesStudents[$marksData[$i]['student_id']][$key]['total'] . "</td>";
+					}
+					else {
+						echo "<td class=\"c0603\">" . $listCoursesStudents[$marksData[$i]['student_id']][$key]['total'] . "</td>";
+					}
 				}
 				else {
-					echo "<td class=\"c0603\">" . $listCoursesStudents[$marksData[$i]['student_id']][$key]['letter_grade'] . "</td>";
+					echo "<td class=\"c0603\">&nbsp;</td>";
 				}
-			}
-			else {
-				echo "<td class=\"c0603\">&nbsp;</td>";
-			}
 		}
 		for($j=0;$j<(13-count($listCoursesId)); $j++) {
 			echo "<td class=\"c0603\">&nbsp;</td>";
@@ -432,9 +465,21 @@ tr    { page-break-inside:avoid; page-break-after:auto }
 			exit;
 		}
 		foreach($listCoursesId as $key => $value) {
-			if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) && !empty($listCoursesStudents[$marksData[$i]['student_id']][$key]['grade_point'])) {
-				//debug($listSGPA); //debug($listCoursesStudents); debug($key); debug($listCoursesStudents[$marksData[$i]['student_id']][$key]['total']);
-					echo "<td class=\"c0703\">" . (($value['type'] == "Seminar" || $value['type'] == "Lab") ? (is_numeric($listCoursesStudents[$marksData[$i]['student_id']][$key]['total']) ? bcadd($listSGPA[round($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'])+1],0,1) : $marksData[$i]['student_id'][$key]['total'] ) : $listSGPA[round(bcadd($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'], $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'], 2)+1)]) . "</td>";
+			if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) 
+				&& !empty($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment']) 
+				&& !empty($listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'])
+				&& $listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'] != 0
+				&& $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'] != 0) {
+					echo "<td class=\"c0703\">" . 
+					$listSGPA[round(bcadd($listCoursesStudents[$marksData[$i]['student_id']][$key]['internal_assessment'], $listCoursesStudents[$marksData[$i]['student_id']][$key]['end_semester_examination'], 2))+1] . "</td>";
+			}
+			else if(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) && is_numeric($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'])) {
+				echo "<td class=\"c0703\">" . 
+					$listSGPA[round($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'])+1] . "</td>";
+			}
+			elseif(isset($marksData[$i]) && isset($listCoursesStudents[$marksData[$i]['student_id']][$key]) && !is_numeric($listCoursesStudents[$marksData[$i]['student_id']][$key]['total'])) {
+				echo "<td class=\"c0703\">" . 
+					$listCoursesStudents[$marksData[$i]['student_id']][$key]['total'] . "</td>";
 			}
 			else {
 				echo "<td class=\"c0703\">&nbsp;</td>";
