@@ -1,0 +1,5 @@
+v2.0.4
+Added Feature: Added New font "Assistant" for custom theme setting's each font family selection fields.
+Few backend and frontend CSS and JS Refinement done.
+Compatibility check with  latest WordPress Version.
+Added Feature: Disable Menu toggle on mobile if already exist.
