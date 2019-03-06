@@ -7,6 +7,7 @@ use Cake\Mailer\Email;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Datasource\ConnectionManager;
+use Cake\Routing\RequestActionTrait;
 
 class CandidatesController extends AppController {
 
@@ -151,12 +152,41 @@ class CandidatesController extends AppController {
         $this->set('allocatedSeats', $allocatedSeats);
     }
     
+    public function registrationcompletion() {
+        $candidate = $this->Candidates->find('all')->where(['id' => $this->Auth->user('id')])->toArray();
+        if(count($candidate)  == 0) {
+            $candidate = $this->Candidates->newEntity();
+        }
+        else if(count($candidate)  >  1) {
+            $this->Flash->error('More than 1 record found');
+            return null;
+        }
+        else {
+            $candidate = $candidate[0];
+        }
+        //debug($candidate); return null;
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            //debug($this->request->getData()); return null;
+            $candidate = $this->Candidates->patchEntity($candidate, $this->request->getData(), ['validate' => 'registration']);
+            $candidate->user_id = $this->Auth->user('id');
+            //debug($candidate); return null;
+            if ($this->Candidates->save($candidate)) {
+                $this->Flash->success('Your Registration information is uploaded sucessfully');
+                $this->set('candidate', $candidate);
+                RequestActionTrait::requestAction(['controller' => 'Uploadfiles', 'action' => 'registrationdocs'], array('post' => $this->request->getData()));
+                return null;
+            }
+            $this->Flash->error('The registraton could not be completed. Please, try again or contact Support.');
+        }
+        $this->set('candidate', $candidate);
+    }
 
     public function isAuthorized($user = null) {
 	//return parent::isAuthorized($user);
         // All users with role as 'exam' can add seats seatalloted
         if (isset($user['role']) && $user['role'] === 'student' && ($this->request->getParam('action') === 'add' 
-                || $this->request->getParam('action') === 'index' || $this->request->getParam('action') === 'seatalloted' || $this->request->getParam('action') === 'formcompleted')) {
+                || $this->request->getParam('action') === 'index' || $this->request->getParam('action') === 'seatalloted' || $this->request->getParam('action') === 'formcompleted'
+                || $this->request->getParam('action') === 'registrationcompletion')) {
             return true;
         }
 
@@ -167,8 +197,6 @@ class CandidatesController extends AppController {
                 return true;
             }
         }
-
-        
     }
 
 }

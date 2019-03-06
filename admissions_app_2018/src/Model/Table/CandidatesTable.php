@@ -191,6 +191,45 @@ class CandidatesTable extends Table
             
         return $validator;
     }
+
+    public function validationRegistration(Validator $validator) {
+        /*$validator
+            ->requirePresence('name')
+            ->notEmpty('name', 'Please fill this field')
+            ->requirePresence('f_name')
+            ->notEmpty('f_name', 'Please fill this field')
+            ->requirePresence('dob')
+            ->notEmpty('dob', 'Please fill this field')
+            ->add('dob', [
+                'validFormat' => [
+                    'rule' => array('custom', '/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/'),
+                    'message' => 'Please enter a valid date (DD/MM/YYYY).',
+                ],
+                'checkallpresent' => [
+                    'rule' => function ($value, $context) {
+                        //debug($value); debug($context); debug($sessionData);
+                        $pattern = '/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/';
+                        $valid = preg_match($pattern, $value);
+                        if($valid === false || $valid === 0) {
+                            return true;
+                        }
+                        $age = 0;
+                        $from = new DateTime(date("Y-m-d", strtotime($value)));
+                        $to   = new DateTime('today');
+                        $age = $to->diff($from)->y;
+                        //debug($value); debug($age); return false;
+                        if($age >= 17) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    },
+                    'message' => 'The minimum age requirement is not met.'
+                ]
+            ]);*/
+        return $validator;
+    }
     
     public function isOwnedBy($articleId, $userId)
     {

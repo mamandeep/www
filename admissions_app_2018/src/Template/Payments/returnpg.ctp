@@ -51,7 +51,7 @@ td {
     <tr>
         <td colspan="2">
             <div style="text-align: center; font-size: 30px;">
-                <?php echo $this->Form->create('Temp', array('id' => 'Continue_Form', 'url' => Router::url( '/payments/submitfee', true ))); ?>
+                <?php echo $this->Form->create('Temp', array('id' => 'Continue_Form', 'url' => Router::url( '/candidates/registrationcompletion', true ))); ?>
                 <?php echo $this->Form->submit('Continue', array('div' => false, 'id' => 'continue_bt' )); ?>
                 <?php echo $this->Form->end(); ?>
             </div>
