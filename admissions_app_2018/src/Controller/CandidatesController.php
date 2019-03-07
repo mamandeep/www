@@ -8,8 +8,11 @@ use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Datasource\ConnectionManager;
 use Cake\Routing\RequestActionTrait;
+use Cake\View\CellTrait;
 
 class CandidatesController extends AppController {
+
+    use CellTrait;
 
     public function initialize() {
         parent::initialize();
@@ -173,8 +176,9 @@ class CandidatesController extends AppController {
             if ($this->Candidates->save($candidate)) {
                 $this->Flash->success('Your Registration information is uploaded sucessfully');
                 $this->set('candidate', $candidate);
-                RequestActionTrait::requestAction(['controller' => 'Uploadfiles', 'action' => 'registrationdocs'], array('post' => $this->request->getData()));
-                return null;
+                $this->cell('Regcompletion::registrationdocs');
+                //RequestActionTrait::requestAction(['controller' => 'Uploadfiles', 'action' => 'registrationdocs'], array('post' => $this->request->getData()));
+                return $this->redirect(['action' => 'registrationcompletion']);
             }
             $this->Flash->error('The registraton could not be completed. Please, try again or contact Support.');
         }
