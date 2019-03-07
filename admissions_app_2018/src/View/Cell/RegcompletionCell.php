@@ -7,16 +7,18 @@ use Cake\View\Cell;
 class RegcompletionCell extends Cell {
     //public $view = 'single_post';
     // I am renaming the method `render` to `run` for a specific reason...
-    public function display(array $options = [])
+    public function run(array $options = [])
     {
         //$this->loadModel('Posts');
         //$post = $this->Posts->findById($options['id']
+        $this->registrationdocs();
         $this->set('unread_count', 4);
         return $this; // So I can chain the `run` method
     }
 
     public function registrationdocs() {
     	$uploadFilesTable = TableRegistry::get('Uploadfiles');
+    	debug("comes here"); return null;
         $existingFiles = $uploadFilesTable->find('all')
                                    ->where(['Uploadfiles.user_id' => $this->Auth->user('id')])
                                    ->order(['Uploadfiles.created' => 'DESC'])->toArray();
