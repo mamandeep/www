@@ -176,7 +176,8 @@ class CandidatesController extends AppController {
             if ($this->Candidates->save($candidate)) {
                 $this->Flash->success('Your Registration information is uploaded sucessfully');
                 $this->set('candidate', $candidate);
-                $this->decorate('RegcompletionCell');//$this->cell('Regcompletion::registrationdocs');debug("comes here too"); return null;
+                $this->Upload->uploadDocuments();
+                //echo $this->decorate('RegcompletionCell');//$this->cell('Regcompletion::registrationdocs');debug("comes here too"); return null;
                 //RequestActionTrait::requestAction(['controller' => 'Uploadfiles', 'action' => 'registrationdocs'], array('post' => $this->request->getData()));
                 return $this->redirect(['action' => 'registrationcompletion']);
             }

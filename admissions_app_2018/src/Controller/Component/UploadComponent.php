@@ -1,35 +1,33 @@
-<?php
+<?php 
 
-namespace App\View\Cell;
+namespace App\Controller\Component;
 
-use Cake\View\Cell;
+use Cake\Controller\Component;
+use Cake\Event\Event;
+use Cake\Controller\Controller;
 
-class RegcompletionCell extends Cell {
-    //public $view = 'single_post';
-    // I am renaming the method `render` to `run` for a specific reason...
+class UploadComponent extends Component {
+	
+	var $event = null;
+     /**
+     * Startup component
+     *
+     * @param object $controller Instantiating controller
+     * @access public
+     */ 
     
-    public function display(array $options = []) {
-    	$this->set('unread_count', 4);
-        return $this; // So I can chain the `run` method
+    public function startup(Event $event) {
+        $this->event = $event;
     }
 
-    public function run(array $options = [])
-    {
-        //$this->loadModel('Posts');
-        //$post = $this->Posts->findById($options['id']
-        $this->registrationdocs();
-        $this->set('unread_count', 4);
-        return $this; // So I can chain the `run` method
-    }
-
-    public function registrationdocs() {
-    	$uploadFilesTable = TableRegistry::get('Uploadfiles');
-    	debug("comes here"); return null;
-        $existingFiles = $uploadFilesTable->find('all')
+	public function uploadDocuments() {
+    	//debug($this->); exit;
+        $existingFiles = $this->event->Uploadfiles->find('all')
                                    ->where(['Uploadfiles.user_id' => $this->Auth->user('id')])
                                    ->order(['Uploadfiles.created' => 'DESC'])->toArray();
         $newFile = (count($existingFiles) === 0) ? $this->Uploadfiles->newEntity() : $existingFiles[0];
         if ($this->request->is(['post', 'put'])) {
+        	debug($this->request->getData()); exit;
             if(!empty($this->request->getData()['file']['name']) && is_uploaded_file($this->request->getData()['file']['tmp_name'])){
                 $fileName = $this->request->getData()['file']['name'];
                 $uniqueId = $this->getName();
@@ -41,7 +39,7 @@ class RegcompletionCell extends Cell {
                     $newFile->modified = date("Y-m-d H:i:s");
                     $newFile->user_id = $this->Auth->user('id');
                     $newFile->photo_status = $newFile->photo_status + 1;
-                    if ($uploadFilesTable->save($newFile)) {
+                    if ($this->Uploadfiles->save($newFile)) {
                         $this->Flash->success(__('Passport size photograph has been uploaded successfully.'));
                         return null; //$this->redirect(['controller' => 'candidates', 'action' => 'registrationcompletion']);
                     } else {
@@ -68,8 +66,14 @@ class RegcompletionCell extends Cell {
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, strlen($characters) - 1)];
         }
-
         return $randomString;
     }
+
+	public function uploadDocuments1() {
+		// context is of the controller only
+		// show messages
+		return null;
+	}
 }
+
 ?>
