@@ -9,6 +9,7 @@ use Cake\Datasource\ConnectionManager;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Cake\Mailer\Email;
 
 use Cake\ORM\TableRegistry;
 

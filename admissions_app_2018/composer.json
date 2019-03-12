@@ -11,7 +11,8 @@
         "cakephp/migrations": "~1.0",
         "cakephp/plugin-installer": "~1.0",
         "maiconpinto/cakephp-adminlte-theme": "^1.0",
-        "phpoffice/phpspreadsheet": "^1.6"
+        "phpoffice/phpspreadsheet": "^1.6",
+        "phpmailer/phpmailer": "^6.0"
     },
     "require-dev": {
         "psy/psysh": "@stable",

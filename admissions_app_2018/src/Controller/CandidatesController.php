@@ -9,6 +9,7 @@ use Cake\ORM\TableRegistry;
 use Cake\Datasource\ConnectionManager;
 use Cake\Routing\RequestActionTrait;
 use Cake\View\CellTrait;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class CandidatesController extends AppController {
 
@@ -35,19 +36,44 @@ class CandidatesController extends AppController {
     }
 
     public function sendemail() {
-        $email = new Email('default');
-        $email->setSender('app@example.com', 'MyApp emailer');
-        Email::setConfigTransport('ernet', [
-            'host' => 'ssl://mail.eis.ernet.in',
+        /*$email = new Email('default');
+        $email->setSender('sa@cup.edu.in', 'Amandeep Singh Mann');
+        Email::setConfigTransport('gsuite', [
+            'host' => 'ssl://smtp.gmail.com',
             'port' => 465,
-            'username' => 'sa@cup.ac.in',
-            'password' => 'ASMann@123#',
+            'timeout' => 30,
+            'username' => 'sa@cup.edu.in',
+            'password' => 'aero&123pod',
             'className' => 'Smtp'
-        ]);
-        $email->setFrom(['sa@cup.ac.in' => 'My Site'])
+        ]);*/
+
+	/*$returnvalue = $email->setFrom(['sa@cup.edu.in' => 'Amandeep Singh Mann'])
                 ->setTo('mann.cse@gmail.com')
-                ->setSubject('About Link Confirmation')
-                ->send('My message');
+                ->setSubject('Completion of Information submission')
+                ->send('We have received your application fee and you have completed the Information submission.');*/
+        //debug($returnvalue); exit;
+	$mail = new PHPMailer(); // create a new object
+	$mail->IsSMTP(); // enable SMTP
+	$mail->SMTPDebug = 1; // debugging: 1 = errors and messages, 2 = messages only
+	$mail->SMTPAuth = true; // authentication enabled
+	$mail->SMTPSecure = 'tls'; // secure transfer enabled REQUIRED for Gmail
+	$mail->Host = "smtp.gmail.com";
+	$mail->Port = 587; // or 587
+	$mail->IsHTML(true);
+	$mail->Username = "sa@cup.edu.in";
+	$mail->Password = "ComputerCentre@123";
+	$mail->SetFrom("sa@cup.edu.in");
+	$mail->Subject = "Admission Test";
+	$mail->Body = "Does it go to SPAM";
+	$mail->AddAddress("mann.cse@gmail.com");
+
+	 if(!$mail->Send()) {
+	    debug("Mailer Error: " . $mail->ErrorInfo);
+		 exit;
+	 } else {
+	    debug("Message has been sent");
+		exit;
+	 }
     }
 
     public function add() {
@@ -177,6 +203,7 @@ class CandidatesController extends AppController {
                 $this->Flash->success('Your Registration information is uploaded sucessfully');
                 $this->set('candidate', $candidate);
                 $this->Upload->uploadDocuments();
+                $this->sendemail();
                 //echo $this->decorate('RegcompletionCell');//$this->cell('Regcompletion::registrationdocs');debug("comes here too"); return null;
                 //RequestActionTrait::requestAction(['controller' => 'Uploadfiles', 'action' => 'registrationdocs'], array('post' => $this->request->getData()));
                 return $this->redirect(['action' => 'registrationcompletion']);
