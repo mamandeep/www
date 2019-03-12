@@ -54,17 +54,24 @@ class CandidatesController extends AppController {
         //debug($returnvalue); exit;
 	$mail = new PHPMailer(); // create a new object
 	$mail->IsSMTP(); // enable SMTP
+	$mail->SMTPOptions = array(
+	     'ssl' => array(
+		'verify_peer' => false,
+		'verify_peer_name' => false,
+		'allow_self_signed' => true
+		)
+	);
 	$mail->SMTPDebug = 1; // debugging: 1 = errors and messages, 2 = messages only
 	$mail->SMTPAuth = true; // authentication enabled
-	$mail->SMTPSecure = 'tls'; // secure transfer enabled REQUIRED for Gmail
+	$mail->SMTPSecure = 'ssl'; // secure transfer enabled REQUIRED for Gmail
 	$mail->Host = "smtp.gmail.com";
-	$mail->Port = 587; // or 587
+	$mail->Port = 465; // or 587
 	$mail->IsHTML(true);
 	$mail->Username = "sa@cup.edu.in";
-	$mail->Password = "ComputerCentre@123";
+	$mail->Password = "";
 	$mail->SetFrom("sa@cup.edu.in");
-	$mail->Subject = "Admission Test";
-	$mail->Body = "Does it go to SPAM";
+	$mail->Subject = "Admission Test 2";
+	$mail->Body = "Does it go to SPAM2";
 	$mail->AddAddress("mann.cse@gmail.com");
 
 	 if(!$mail->Send()) {

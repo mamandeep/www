@@ -73,3 +73,6 @@
 	</ol>
 	<input type="submit" value="Patch Seats table with new seat."/>
 </form>
+<form action="/admissions_app_2018/commands/showroundwise" method="post">
+	<input type="submit" value="Click here to see round wise admissions upto now"/>
+</form>
