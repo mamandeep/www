@@ -115,26 +115,26 @@ class CommandsController extends AppController {
     	$this->set("R3", $R3);
     	$this->set("R4", $R4);
     	//exit;
-    	$query2 = "select * from cancelseats c1
-    				left join seats s2 on c1.fee_id = s2.cancelled_fee_id_C1
-    				left join seats s3 on c1.fee_id = s3.cancelled_fee_id_C2R1
-    				left join seats s4 on c1.fee_id = s4.cancelled_fee_id_C2R2
-    				left join seats s5 on c1.fee_id = s5.cancelled_fee_id_C3
-    				left join seats s6 on c1.fee_id = s6.cancelled_fee_id_C3A
-    				left join seats s7 on c1.fee_id = s7.cancelled_fee_id_C3R2
-    				left join seats s8 on c1.fee_id = s8.cancelled_fee_id_C3R2A
-    				left join seats s9 on c1.fee_id = s9.cancelled_fee_id_C3R3
-    				left join seats s10 on c1.fee_id = s10.cancelled_fee_C3R3A
-    				left join seats s11 on c1.fee_id = s11.cancelled_fee_C3R3B
-    				left join seats s12 on c1.fee_id = s12.cancelled_fee_C3R3C
-    				left join seats s13 on c1.fee_id = s13.cancelled_fee_C4R1
-    				left join seats s14 on c1.fee_id = s14.cancelled_fee_C4R2
-    				left join seats s15 on c1.fee_id = s15.cancelled_fee_C4R3
-    				left join seats s16 on c1.fee_id = s16.cancelled_fee_C4R4
-    				left join seats s17 on c1.fee_id = s17.cancelled_fee_C4R5
-    				left join seats s18 on c1.fee_id = s18.cancelled_fee_C5R1
-    				left join seats s19 on c1.fee_id = s19.cancelled_fee_C5R2
-    				left join seats s20 on c1.fee_id = s20.cancelled_fee_C5R3";
+    	$query2 = "select c1.fee_id, c1.modified, c1.candidate_id from cancelseats c1
+    				left join seats s2 on c1.fee_id = s2.cancelled_fee_id_C1 and c1.fee_id is not null and s2.cancelled_fee_id_C1
+    				left join seats s3 on c1.fee_id = s3.cancelled_fee_id_C2R1 and c1.fee_id is not null and s3.cancelled_fee_id_C2R1 is not null
+    				left join seats s4 on c1.fee_id = s4.cancelled_fee_id_C2R2 and c1.fee_id is not null and s4.cancelled_fee_id_C2R2 is not null
+    				left join seats s5 on c1.fee_id = s5.cancelled_fee_id_C3 and c1.fee_id is not null and s5.cancelled_fee_id_C3 is not null
+    				left join seats s6 on c1.fee_id = s6.cancelled_fee_id_C3A and c1.fee_id is not null and s6.cancelled_fee_id_C3A is not null
+    				left join seats s7 on c1.fee_id = s7.cancelled_fee_id_C3R2 and c1.fee_id is not null and s7.cancelled_fee_id_C3R2 is not null
+    				left join seats s8 on c1.fee_id = s8.cancelled_fee_id_C3R2A and c1.fee_id is not null and s8.cancelled_fee_id_C3R2A is not null
+    				left join seats s9 on c1.fee_id = s9.cancelled_fee_id_C3R3 and c1.fee_id is not null and s9.cancelled_fee_id_C3R3 is not null
+    				left join seats s10 on c1.fee_id = s10.cancelled_fee_C3R3A and c1.fee_id is not null and s10.cancelled_fee_C3R3A is not null
+    				left join seats s11 on c1.fee_id = s11.cancelled_fee_C3R3B and c1.fee_id is not null and s11.cancelled_fee_C3R3B is not null
+    				left join seats s12 on c1.fee_id = s12.cancelled_fee_C3R3C and c1.fee_id is not null and s12.cancelled_fee_C3R3C is not null
+    				left join seats s13 on c1.fee_id = s13.cancelled_fee_C4R1 and c1.fee_id is not null and s13.cancelled_fee_C4R1 is not null
+    				left join seats s14 on c1.fee_id = s14.cancelled_fee_C4R2 and c1.fee_id is not null and s14.cancelled_fee_C4R2 is not null
+    				left join seats s15 on c1.fee_id = s15.cancelled_fee_C4R3 and c1.fee_id is not null and s15.cancelled_fee_C4R3 is not null
+    				left join seats s16 on c1.fee_id = s16.cancelled_fee_C4R4 and c1.fee_id is not null and s16.cancelled_fee_C4R4 is not null
+    				left join seats s17 on c1.fee_id = s17.cancelled_fee_C4R5 and c1.fee_id is not null and s17.cancelled_fee_C4R5 is not null
+    				left join seats s18 on c1.fee_id = s18.cancelled_fee_C5R1 and c1.fee_id is not null and s18.cancelled_fee_C5R1 is not null
+    				left join seats s19 on c1.fee_id = s19.cancelled_fee_C5R2 and c1.fee_id is not null and s19.cancelled_fee_C5R2 is not null
+    				left join seats s20 on c1.fee_id = s20.cancelled_fee_C5R3 and c1.fee_id is not null and s20.cancelled_fee_C5R3 is not null";
 
 		$stmt2 = $conn->execute($query2);
     	$data = $stmt2->fetchAll('assoc');
@@ -147,9 +147,7 @@ class CommandsController extends AppController {
     	//$this->set("cancelseats", $data);
     	foreach($data as $key => $value) {
     		$count = 1;
-    		//debug($value);
     		foreach($daterange as $start => $end) {
-    			//debug($value['modified']); debug($start);
     			//debug(strtotime($value['modified'])); strtotime($start);
     			if(strtotime($value['modified']) >= strtotime($start) && strtotime($value['modified']) <= strtotime($end) && $count == 1) {
     				$RC1[] = $value;
@@ -166,6 +164,7 @@ class CommandsController extends AppController {
     			$count++;
     		}
     	}
+    	//debug($RC1); debug($RC2); debug($RC3); debug($RC4); exit;
     	$this->set("RC1", $RC1);
     	$this->set("RC2", $RC2);
     	$this->set("RC3", $RC3);

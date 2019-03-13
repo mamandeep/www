@@ -62,7 +62,7 @@
 	} ?>
 	<tr>
 		<td>S. No.</td>
-		<td>Round I</td>
+		<td>Cancelled Round III</td>
 	</tr>
 	<?php $count = 1;
 	foreach($RC3 as $key => $value) {
